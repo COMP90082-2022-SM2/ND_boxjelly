@@ -1,4 +1,4 @@
-# ND_boxjelly
+# COMP90082_2022_SM2_ND_boxjelly
 
 ## Project Description 
 
