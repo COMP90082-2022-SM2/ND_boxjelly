@@ -21,7 +21,7 @@ The project team intended to provide feasible solutions to the described problem
 
 ## Github repo
 
-├── docs/                    # Documentation files (Includes requirements etc)
+├── docs/                    # Documentation files (Includes requirements, confluence export etc)
 
 ├── src/                       # src code
 
