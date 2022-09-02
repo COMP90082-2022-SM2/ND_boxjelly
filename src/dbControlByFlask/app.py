@@ -19,11 +19,11 @@ def hello_world():
 @app.route('/get/<int:case_id>')
 def query(case_id):  # put application's code here
     result = Case.query.filter_by(id=case_id).one()
-    if result is None:
-        return 'record not found!'
-    else:
+    try:
+        result = Case.query.filter_by(id=case_id).one()
         return repr(result)
-        # return 'case found'
+    except:
+        return 'record not found'
 
 @app.route('/process', methods=['POST'])
 def process_pdf():
