@@ -1,26 +1,24 @@
-# do not write password into script!
-DB_USERNAME = 'root'
-DB_PASSWORD = 'root'
-DB_HOST = '127.0.0.1'
-DB_PORT= '3306'
-DB_DEV = 'test'
+# make sure the username, password and database name are correct
+username = 'root'
+password = ''
+userpass = 'mysql+pymysql://' + username + ':' + password + '@'
+# keep this as is for a hosted website
+server  = '127.0.0.1'
+# change to YOUR database name, with a slash added as shown
+dbname   = '/users'
 
+# this socket is going to be very different on a WINDOWS computer
+# try 'C:/xampp/mysql/mysql.sock'
+socket   = '?unix_socket=/Applications/XAMPP/xamppfiles/var/mysql/mysql.sock'
 
 class Config(object):
     TESTING = False
+    
+# put them all together as a string that shows SQLAlchemy where the database is
+class MysqlConfig(Config):
+    SQLALCHEMY_DATABASE_URI = userpass + server + dbname + socket
+    SQLALCHEMY_TRACK_MODIFICATIONS = True
 
-
-class ProductionConfig(Config):
-    # DATABASE_URI = 'mysql://user@localhost/foo'
-    pass
-
-
-class DevelopmentConfig(Config):
-    DATABASE_URI = f'mysql+pymysql://{DB_USERNAME}:{DB_PASSWORD}@{DB_HOST}:{DB_PORT}/{DB_DEV}'
-    SQLALCHEMY_DATABASE_URI = DATABASE_URI
+class sqliteConfig(Config):
+    SQLALCHEMY_DATABASE_URI = 'sqlite:///users.sqlite3' # sqlite3 users.sqlite3 .tables
     SQLALCHEMY_TRACK_MODIFICATIONS = False
-
-
-class TestingConfig(Config):
-    # DATABASE_URI = 'sqlite:///:memory:'
-    TESTING = True

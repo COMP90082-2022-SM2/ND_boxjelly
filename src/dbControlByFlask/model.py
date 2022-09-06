@@ -1,7 +1,17 @@
 from exts import db
 
+from exts import db
 
-class Case(db.Model):
+class users(db.Model):
+    _id = db.Column("id", db.Integer, primary_key=True)
+    name = db.Column(db.String(100))
+    email = db.Column(db.String(100))
+
+    def __init__(self, name, email):
+        self.name = name
+        self.email = email
+
+"""class Case(db.Model):
     __tablename__ = 'case'
     id = db.Column(db.Integer, primary_key=True)
     description = db.Column(db.String(100), nullable=False)
@@ -16,7 +26,7 @@ class Patient(db.Model):
     address = db.Column(db.String(100), nullable=False)
 
     def __repr__(self):
-        return f'patient {self.id}'
+        return f'patient {self.id}'"""
 
 
 # class User(db.Model):
