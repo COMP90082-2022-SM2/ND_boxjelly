@@ -8,10 +8,11 @@ from sqlalchemy.sql import text
 from config import MysqlConfig, sqliteConfig
 from model import users
 
-import pdfminer
-from io import StringIO
-from pdfminer.high_level import extract_text_to_fp
-from pdfminer.layout import LAParams
+import pandas as pd 
+from tabula import read_pdf
+from tabulate import tabulate
+import pandas as pd
+import io
 
 app = Flask(__name__)
 app.secret_key = "abc"
@@ -30,20 +31,24 @@ def view():
 
 @app.route("/process", methods=["GET", "POST"])
 def process_pdf():
-    output_string = StringIO()
-    with open('PBSP.pdf', 'rb') as fin:
-        extract_text_to_fp(fin, output_string, laparams=LAParams(),output_type='html', codec=None)
+    filename = "PBSP Summary Document Final.pdf"
+    
+    # Read the only the page n°4 of the file
+    tables = read_pdf(filename,pages = 4, pandas_options={'header': None},
+                         multiple_tables = True, stream = True, lattice=True)
 
-    output = output_string.getvalue().strip()
-    user = output[:15] 
-    usr = users(user, "")
-    session["text"] = user
+    # Transform the result into a string table format
+    table_lists = []
+    for table in tables:
+        lists = [list(filter(lambda x: x == x, inner_list)) for inner_list in table.values.tolist()] # delete all nan values
+        table_lists.append([e for e in lists if e]) #filter out empty lists
+    print(table_lists[0])
+    subtitle = table_lists[0][0][0]
+    answer = table_lists[0][1][0]
+    usr = users(subtitle, answer)
+    session["user"] = subtitle
+    session["email"] = answer
     db.session.add(usr) 
-
-    user2 =  output[:5] 
-    usr2 = users(user2, "")
-    session["text2"] = user2
-    db.session.add(usr2) 
     db.session.commit()
     return redirect(url_for("view"))
 

@@ -4,8 +4,8 @@ from exts import db
 
 class users(db.Model):
     _id = db.Column("id", db.Integer, primary_key=True)
-    name = db.Column(db.String(100))
-    email = db.Column(db.String(100))
+    name = db.Column(db.String(10000))
+    email = db.Column(db.String(10000))
 
     def __init__(self, name, email):
         self.name = name
