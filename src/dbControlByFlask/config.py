@@ -5,7 +5,7 @@ userpass = 'mysql+pymysql://' + username + ':' + password + '@'
 # keep this as is for a hosted website
 server  = '127.0.0.1'
 # change to YOUR database name, with a slash added as shown
-dbname   = '/users'
+dbname   = '/test'
 
 # this socket is going to be very different on a WINDOWS computer
 # try 'C:/xampp/mysql/mysql.sock'
