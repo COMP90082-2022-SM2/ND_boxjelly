@@ -1,5 +1,3 @@
-# http://localhost/phpmyadmin/
-# from django.shortcuts import render
 from flask import Flask, redirect, url_for, render_template, request, session, flash
 from datetime import timedelta
 from flask_sqlalchemy import SQLAlchemy
@@ -7,7 +5,6 @@ import pymysql
 from sqlalchemy.sql import text
 from config import MysqlConfig, sqliteConfig
 from model import users
-from exts import db, app
 
 import pandas as pd
 from tabula import read_pdf
@@ -15,7 +12,14 @@ from tabulate import tabulate
 import pandas as pd
 import io
 
-db.create_all()
+app = Flask(__name__)
+app.secret_key = "abc"
+app.config.from_object(MysqlConfig)
+app.permanent_session_lifetime = timedelta(minutes=1)
+db = SQLAlchemy(app)
+
+
+# db.create_all()
 
 
 @app.route("/")
@@ -32,7 +36,7 @@ def view():
 def process_pdf():
     filename = "PBSP Summary Document Final.pdf"
 
-    # Read the only the page no.4 of the file
+    # Read the only the page n°4 of the file
     tables = read_pdf(filename, pages=4, pandas_options={'header': None},
                       multiple_tables=True, stream=True, lattice=True)
 
@@ -100,12 +104,18 @@ def user():
 def logout():
     if "user" in session:
         user = session["user"]
-        # flash(f"You have been logged out, {user}", "info")
+        flash(f"You have been logged out, {user}", "info")
     session.pop("user", None)
     session.pop("email", None)
     return redirect(url_for("login"))
 
 
+def create_table():
+    db.create_all()
+    db.session.commit()
+
+
 if __name__ == "__main__":
     db.create_all()
+    # db.session.commit()
     app.run(debug=True)
