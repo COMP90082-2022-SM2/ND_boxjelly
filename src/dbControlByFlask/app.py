@@ -8,32 +8,24 @@ from sqlalchemy.sql import text
 from config import MysqlConfig, sqliteConfig
 from model import users
 from exts import db, app
+# from flaskext.mysql import MySQL 
+# from flask_mysqldb import MySQL
 
 import pandas as pd
 from tabula import read_pdf
 from tabulate import tabulate
 import pandas as pd
 import io
-
+import os
+import mysql.connector
 db.create_all()
+import sys
 
-
-@app.route("/")
-def home():
-    return render_template("index.html")
-
-
-@app.route("/view")
-def view():
-    return render_template("view.html", values=users.query.all())  # get all the users and pass as objects to value
-
-
-@app.route("/process", methods=["GET", "POST"])
-def process_pdf():
+def table_extraction(page_num):
     filename = "PBSP Summary Document Final.pdf"
 
     # Read the only the page no.4 of the file
-    tables = read_pdf(filename, pages=4, pandas_options={'header': None},
+    tables = read_pdf(filename, pages=page_num, pandas_options={'header': None},
                       multiple_tables=True, stream=True, lattice=True)
 
     # Transform the result into a string table format
@@ -43,15 +35,39 @@ def process_pdf():
                  table.values.tolist()]  # delete all nan values
         table_lists.append([e for e in lists if e])  # filter out empty lists
     print(table_lists[0])
-    subtitle = table_lists[0][0][0]
-    answer = table_lists[0][1][0]
-    usr = users(subtitle, answer)
-    session["user"] = subtitle
-    session["email"] = answer
-    db.session.add(usr)
-    db.session.commit()
+    return table_lists
+
+@app.route("/")
+def home():
+    return render_template("index.html")
+
+@app.route("/process", methods=["GET", "POST"])
+def process_pdf():
+    mydb = mysql.connector.connect(
+        host="localhost", 
+        user="root", 
+        password="",
+        database="users"
+    )
+    cur = mydb.cursor()
+
+    table_lists = table_extraction(2)
+    # subtitle = table_lists[0][0][0]
+    answer = table_lists[0][0]
+
+    db_table = "short_summary"
+    attribute = "user_id, summary"
+    sql = """INSERT INTO """ + db_table + """(""" + attribute + """) VALUES (%s, %s)"""
+    # cur.execute(sql, ("abc",))
+    cur.execute(sql, (1, str(answer),))
+
+    mydb.commit()
+
     return redirect(url_for("view"))
 
+@app.route("/view")
+def view():
+    return render_template("view.html", values=users.query.all())  # get all the users and pass as objects to value
 
 @app.route("/login", methods=["POST", "GET"])
 def login():
