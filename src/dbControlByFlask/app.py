@@ -21,6 +21,13 @@ import mysql.connector
 db.create_all()
 import sys
 
+table_dict = {1: [("short_summary", "user_id, summary")], 
+    3:[("assessment", "user_id, behaviouralAssessment, nonBehaviouralAssessment")], 
+    4:[("ba_function", "user_id, description, summary, proposedAlternative")], 
+        5: [("goal", "user_id, behaviour, life"), ("strategies", "user_id, environment, teaching, others")], 
+    7: [("reinforcement", "user_id, reinforcer, schedule, howIdentified"), ("de_escalation", "user_id, howtoPrompt, strategies, postIncident")]
+    } 
+
 def table_extraction(page_num):
     filename = "PBSP Summary Document Final.pdf"
 
@@ -37,6 +44,28 @@ def table_extraction(page_num):
     print(table_lists[0])
     return table_lists
 
+def extract_answers(table_lists):
+    answers_all = []
+    for table in table_lists:
+        i = 1
+        answers = []
+        while i < len(table):
+            if len(table[i-1]) == 1 and len(table[i]) == 1:
+                answers.append(str(table[i]))
+                # print(table[i]) #first index: how many tables in that page
+                i+=1
+            else:
+                if len(table) == 2: #sub-col name - value
+                    # insert the value as attribute directly
+                    print("aaa")
+                else:
+                    # insert to another table
+                    print("bbb", table[i])
+            i+=1
+        if len(answers) != 0:
+            answers_all.append(answers)
+    return answers_all
+
 @app.route("/")
 def home():
     return render_template("index.html")
@@ -51,17 +80,63 @@ def process_pdf():
     )
     cur = mydb.cursor()
 
-    table_lists = table_extraction(2)
-    # subtitle = table_lists[0][0][0]
-    answer = table_lists[0][0]
+    page_info = {1: {"continuous": False, "next_page":True}, 3: {"continuous": False, "next_page":False}, 
+    4: {"continuous": False, "next_page":False}, 5: {"continuous": True, "next_page":True}, 
+    7: {"continuous": False, "next_page":True}}
+    # page_num = 7
+    # continuous = True
+    # next_page = False
+    for page_num in [1,3,4,5,7]:
+        continuous = page_info[page_num]['continuous']
+        next_page = page_info[page_num]['next_page']
 
-    db_table = "short_summary"
-    attribute = "user_id, summary"
-    sql = """INSERT INTO """ + db_table + """(""" + attribute + """) VALUES (%s, %s)"""
-    # cur.execute(sql, ("abc",))
-    cur.execute(sql, (1, str(answer),))
+        table_lists = table_extraction(page_num)
+        answers_all = extract_answers(table_lists)
 
-    mydb.commit()
+        if continuous: # continous next page for the same section/attribute
+            next_table_lists = table_extraction(page_num+1)
+            next_page = next_table_lists[0][0]
+            answers_all[-1][0] += str(next_page)
+            next_table_lists[0].pop(0) # pop the content that continued from the previous page
+        if sum(len(string[1].split(",")) for string in table_dict[page_num]) - len(table_dict[page_num]) > sum(len(i) for i in answers_all):
+            if not continuous:
+                next_table_lists = table_extraction(page_num+1)
+            if page_num+1 == 6: # two lines in that question - concatenate to one
+                next_table_lists[0][1] = str(next_table_lists[0][1]) + str(next_table_lists[0][2])
+                next_table_lists[0].pop(2)
+            next_answers = extract_answers(next_table_lists)
+            next_page = True
+    
+        table_index = 0
+        for db_table, attribute in table_dict[page_num]:
+            attr_index = 1
+            value = (1,)
+            while attr_index < len(answers_all[table_index])+1:
+                value += (answers_all[table_index][attr_index-1],)
+                attr_index += 1
+            next_attr_index = 0
+            while next_page and table_index > 0 and next_attr_index < len(next_answers[0]):
+                value += (next_answers[0][next_attr_index], )
+                next_attr_index += 1
+            table_index += 1
+            print("value: ", len(value), value)
+            # value = (1, answers[0],answers[1])
+            # value = (1, str(answer),)
+            if len(attribute.split()) == 2:
+                sql = """INSERT INTO """ + db_table + """(""" + attribute + """) VALUES (%s, %s)"""
+            elif len(attribute.split()) == 3:
+                sql = """INSERT INTO """ + db_table + """(""" + attribute + """) VALUES (%s, %s, %s)"""
+            elif len(attribute.split()) == 4:
+                sql = """INSERT INTO """ + db_table + """(""" + attribute + """) VALUES (%s, %s, %s, %s)"""
+            elif len(attribute.split()) == 5:
+                sql = """INSERT INTO """ + db_table + """(""" + attribute + """) VALUES (%s, %s, %s, %s, %s)"""
+            elif len(attribute.split()) == 6:
+                sql = """INSERT INTO """ + db_table + """(""" + attribute + """) VALUES (%s, %s, %s, %s, %s, %s)"""
+            # cur.execute(sql, ("abc",))
+            print(sql)
+            cur.execute(sql, value)
+
+        mydb.commit()
 
     return redirect(url_for("view"))
 
