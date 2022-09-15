@@ -1,11 +1,29 @@
 <!doctype html>
-<html>
+<html lang="en">
     <head>
+        <meta charset="UTF-8">
         <title> {% block title %} {% endblock %} </title>
+        <style>
+            h1 {
+                color: #202350;
+                font-size: 3em;
+                margin-left: 50px;
+                text-decoration: none;
+            }
+            div {
+                color: #202350;
+                font-size: 1em;
+                margin-left: 50px;
+                margin-right: 50px;
+                text-decoration: none;
+            }
+        </style>
     </head>
     <body>
-        <h1>PBSP Website</h1>
+        <h1>Positive Behaviour Support Plan (PBSP) </h1>
+        <div>
         {% block content %}
-        {% endblock %}
+        {% endblock %} 
+    </div>
     </body>
 </html>

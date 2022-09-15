@@ -1,7 +1,67 @@
 {% extends "base.html" %}
-{%block title %} View All Users {% endblock %} 
-{% block content %} 
-    {% for item in values %} 
-        <p>Name: {{item.name}}, Email: {{item.email}}</p>
+{%block title %} View All Answers {% endblock %}
+{% block content %}
+    <!-- {% for item in data %}
+    <br>
+        <td>{{item}}</td>
+    <br>
+    {% endfor %} -->
+{% for item in users_table %} 
+        <p>Practitioner Name: {{item.name}}, Email: {{item.email}}</p>
     {% endfor %}
-{% endblock %} 
+    <h2> About the Person with Disability </h2>
+    {% for item in short_summary_table %} 
+        <p>Short Summary: {{item.summary}}</p>
+    {% endfor %}
+    <h2> Assessments and Data Gathering </h2>
+    {% for item in assessment_table %} 
+        <p>behaviouralAssessment: </p>
+        <p>{{item.behaviouralAssessment}}</p>
+        <p>nonBehaviouralAssessment: </p>
+        <p>{{item.nonBehaviouralAssessment}}</p>
+    {% endfor %}
+    <h2> Functional Behavioural Assessment </h2>
+    {% for item in ba_function_table %} 
+        <p>description: </p>
+        <p>{{item.description}}</p>
+        <p>summary: </p>
+        <p>{{item.summary}}</p>
+        <p>proposedAlternative: </p>
+        <p>{{item.proposedAlternative}}</p>
+    {% endfor %}
+    <h2> Goals </h2>
+    {% for item in goal_table %} 
+        <p>behaviour: </p>
+        <p>{{item.behaviour}}</p>
+        <p>life: </p>
+        <p>{{item.life}}</p>
+    {% endfor %}
+    <h2> Strategies </h2>
+    {% for item in strategies_table %} 
+        <p>environment: </p>
+        <p>{{item.environment}}</p>
+        <p>teaching: </p>
+        <p>{{item.teaching}}</p>
+        <p>others: </p>
+        <p>{{item.others}}</p>
+    {% endfor %}
+    <h2> Reinforcement for Skill Development </h2>
+    {% for item in reinforcement_table %} 
+        <p>reinforcer: </p>
+        <p>{{item.reinforcer}}</p>
+        <p>schedule: </p>
+        <p>{{item.schedule}}</p>
+        <p>howIdentified: </p>
+        <p>{{item.howIdentified}}</p>
+    {% endfor %}
+    <h2> De-Escalation - Reactive strategies for challenging behaviours </h2>
+    {% for item in de_escalation_table %} 
+        <p>howtoPrompt: </p>
+        <p>{{item.howtoPrompt}}</p>
+        <p>strategies: </p>
+        <p>{{item.strategies}}</p>
+        <p>postIncident: </p>
+        <p>{{item.postIncident}}</p>
+    {% endfor %}
+
+{% endblock %}

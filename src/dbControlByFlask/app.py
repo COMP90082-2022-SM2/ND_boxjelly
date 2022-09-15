@@ -6,7 +6,7 @@ from flask_sqlalchemy import SQLAlchemy
 import pymysql
 from sqlalchemy.sql import text
 from config import MysqlConfig, sqliteConfig
-from model import users
+from model import users, Assessment,ShortSummary, BAFunction, Goal, Strategies, Reinforcement, DeEscalation
 from exts import db, app
 # from flaskext.mysql import MySQL 
 # from flask_mysqldb import MySQL
@@ -27,6 +27,17 @@ table_dict = {1: [("short_summary", "user_id, summary")],
         5: [("goal", "user_id, behaviour, life"), ("strategies", "user_id, environment, teaching, others")], 
     7: [("reinforcement", "user_id, reinforcer, schedule, howIdentified"), ("de_escalation", "user_id, howtoPrompt, strategies, postIncident")]
     } 
+page_info = {1: {"continuous": False, "next_page":True}, 3: {"continuous": False, "next_page":False}, 
+    4: {"continuous": False, "next_page":False}, 5: {"continuous": True, "next_page":True}, 
+    7: {"continuous": False, "next_page":True}}
+
+mydb = mysql.connector.connect(
+        host="localhost", 
+        user="root", 
+        password="",
+        database="users"
+    )
+cur = mydb.cursor()
 
 def table_extraction(page_num):
     filename = "PBSP Summary Document Final.pdf"
@@ -72,20 +83,10 @@ def home():
 
 @app.route("/process", methods=["GET", "POST"])
 def process_pdf():
-    mydb = mysql.connector.connect(
-        host="localhost", 
-        user="root", 
-        password="",
-        database="users"
-    )
-    cur = mydb.cursor()
+    sql = """INSERT INTO users ( name ) VALUES ("user1")"""
+    cur.execute(sql)
+    mydb.commit()
 
-    page_info = {1: {"continuous": False, "next_page":True}, 3: {"continuous": False, "next_page":False}, 
-    4: {"continuous": False, "next_page":False}, 5: {"continuous": True, "next_page":True}, 
-    7: {"continuous": False, "next_page":True}}
-    # page_num = 7
-    # continuous = True
-    # next_page = False
     for page_num in [1,3,4,5,7]:
         continuous = page_info[page_num]['continuous']
         next_page = page_info[page_num]['next_page']
@@ -136,13 +137,29 @@ def process_pdf():
             print(sql)
             cur.execute(sql, value)
 
-        mydb.commit()
+    mydb.commit()
 
     return redirect(url_for("view"))
 
 @app.route("/view")
 def view():
-    return render_template("view.html", values=users.query.all())  # get all the users and pass as objects to value
+    # https://www.digitalocean.com/community/tutorials/how-to-use-templates-in-a-flask-application
+    # https://stackoverflow.com/questions/18150144/how-to-query-a-database-after-render-template
+    # cur.execute("SELECT * FROM short_summary")
+    # data = cur.fetchall()
+    # return render_template("view.html", data=data)
+    users_table = users.query.all()
+    short_summary_table = ShortSummary.query.all()
+    assessment_table = Assessment.query.all()
+    ba_function_table = BAFunction.query.all()
+    goal_table = Goal.query.all()
+    strategies_table = Strategies.query.all()
+    reinforcement_table = Reinforcement.query.all()
+    de_escalation_table = DeEscalation.query.all()
+    return render_template("view.html", users_table=users_table, short_summary_table=short_summary_table, 
+    assessment_table=assessment_table, ba_function_table=ba_function_table, goal_table=goal_table, 
+    strategies_table=strategies_table, reinforcement_table=reinforcement_table, de_escalation_table=de_escalation_table)
+    # return render_template("view.html", values=users.query.all())  # get all the users and pass as objects to value
 
 @app.route("/login", methods=["POST", "GET"])
 def login():
