@@ -102,8 +102,8 @@ def process_pdf():
             if not continuous:
                 next_table_lists = table_extraction(page_num+1)
             if page_num+1 == 6: # two lines in that question - concatenate to one
-                next_table_lists[0][1] = str(next_table_lists[0][1]) + str(next_table_lists[0][2])
-                next_table_lists[0].pop(2)
+                next_table_lists[0][0][0] = next_table_lists[0][0][0] + next_table_lists[0][1][0]
+                next_table_lists[0].pop(1)
             next_answers = extract_answers(next_table_lists)
             next_page = True
     
