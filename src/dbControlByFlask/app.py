@@ -8,6 +8,7 @@ from sqlalchemy.sql import text
 from config import MysqlConfig, sqliteConfig
 from model import users, Assessment,ShortSummary, BAFunction, Goal, Strategies, Reinforcement, DeEscalation
 from exts import db, app
+
 from pdf_reader import table_extraction, extract_answers, page_info
 from data_inserter import data_insert
 
@@ -18,6 +19,25 @@ import pandas as pd
 import io
 import os
 import mysql.connector
+
+
+table_dict = {1: [("short_summary", "user_id, summary")], 
+    3:[("assessment", "user_id, behaviouralAssessment, nonBehaviouralAssessment")], 
+    4:[("ba_function", "user_id, description, summary, proposedAlternative")], 
+        5: [("goal", "user_id, behaviour, life"), ("strategies", "user_id, environment, teaching, others")], 
+    7: [("reinforcement", "user_id, reinforcer, schedule, howIdentified"), ("de_escalation", "user_id, howtoPrompt, strategies, postIncident")]
+    } 
+
+mydb = mysql.connector.connect(
+        host="localhost", 
+        user="root", 
+        password="",
+        database="users"
+    )
+cur = mydb.cursor()
+
+db.create_all()
+
 
 table_dict = {1: [("short_summary", "user_id, summary")], 
     3:[("assessment", "user_id, behaviouralAssessment, nonBehaviouralAssessment")], 
@@ -43,6 +63,7 @@ def process_pdf():
     # https://www.w3schools.com/Python/python_mysql_insert.asp
     # https://www.educative.io/answers/how-to-add-data-to-databases-in-flask
     data_insert(mydb, cur, "users", "name", ("user1", ))  
+
 
     for page_num in [1,3,4,5,7]:
         continuous = page_info[page_num]['continuous']
@@ -80,8 +101,8 @@ def process_pdf():
             print("value: ", len(value), value)
             # value = (1, answers[0],answers[1])
             # value = (1, str(answer),)
+
             data_insert(mydb, cur, db_table, attribute, value)
-            
     return redirect(url_for("view"))
 
 @app.route("/view")
