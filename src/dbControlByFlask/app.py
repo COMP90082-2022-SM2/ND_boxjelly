@@ -8,8 +8,9 @@ from sqlalchemy.sql import text
 from config import MysqlConfig, sqliteConfig
 from model import users, Assessment,ShortSummary, BAFunction, Goal, Strategies, Reinforcement, DeEscalation
 from exts import db, app
-# from flaskext.mysql import MySQL 
-# from flask_mysqldb import MySQL
+
+from pdf_reader import table_extraction, extract_answers, page_info
+from data_inserter import data_insert
 
 import pandas as pd
 from tabula import read_pdf
@@ -18,8 +19,7 @@ import pandas as pd
 import io
 import os
 import mysql.connector
-db.create_all()
-import sys
+
 
 table_dict = {1: [("short_summary", "user_id, summary")], 
     3:[("assessment", "user_id, behaviouralAssessment, nonBehaviouralAssessment")], 
@@ -27,9 +27,6 @@ table_dict = {1: [("short_summary", "user_id, summary")],
         5: [("goal", "user_id, behaviour, life"), ("strategies", "user_id, environment, teaching, others")], 
     7: [("reinforcement", "user_id, reinforcer, schedule, howIdentified"), ("de_escalation", "user_id, howtoPrompt, strategies, postIncident")]
     } 
-page_info = {1: {"continuous": False, "next_page":True}, 3: {"continuous": False, "next_page":False}, 
-    4: {"continuous": False, "next_page":False}, 5: {"continuous": True, "next_page":True}, 
-    7: {"continuous": False, "next_page":True}}
 
 mydb = mysql.connector.connect(
         host="localhost", 
@@ -39,43 +36,23 @@ mydb = mysql.connector.connect(
     )
 cur = mydb.cursor()
 
-def table_extraction(page_num):
-    filename = "PBSP Summary Document Final.pdf"
+db.create_all()
 
-    # Read the only the page no.4 of the file
-    tables = read_pdf(filename, pages=page_num, pandas_options={'header': None},
-                      multiple_tables=True, stream=True, lattice=True)
 
-    # Transform the result into a string table format
-    table_lists = []
-    for table in tables:
-        lists = [list(filter(lambda x: x == x, inner_list)) for inner_list in
-                 table.values.tolist()]  # delete all nan values
-        table_lists.append([e for e in lists if e])  # filter out empty lists
-    print(table_lists[0])
-    return table_lists
+table_dict = {1: [("short_summary", "user_id, summary")], 
+    3:[("assessment", "user_id, behaviouralAssessment, nonBehaviouralAssessment")], 
+    4:[("ba_function", "user_id, description, summary, proposedAlternative")], 
+        5: [("goal", "user_id, behaviour, life"), ("strategies", "user_id, environment, teaching, others")], 
+    7: [("reinforcement", "user_id, reinforcer, schedule, howIdentified"), ("de_escalation", "user_id, howtoPrompt, strategies, postIncident")]
+    } 
 
-def extract_answers(table_lists):
-    answers_all = []
-    for table in table_lists:
-        i = 1
-        answers = []
-        while i < len(table):
-            if len(table[i-1]) == 1 and len(table[i]) == 1:
-                answers.append(str(table[i]))
-                # print(table[i]) #first index: how many tables in that page
-                i+=1
-            else:
-                if len(table) == 2: #sub-col name - value
-                    # insert the value as attribute directly
-                    print("aaa")
-                else:
-                    # insert to another table
-                    print("bbb", table[i])
-            i+=1
-        if len(answers) != 0:
-            answers_all.append(answers)
-    return answers_all
+mydb = mysql.connector.connect(
+        host="localhost", 
+        user="root", 
+        password="",
+        database="users"
+    )
+cur = mydb.cursor()
 
 @app.route("/")
 def home():
@@ -83,9 +60,10 @@ def home():
 
 @app.route("/process", methods=["GET", "POST"])
 def process_pdf():
-    sql = """INSERT INTO users ( name ) VALUES ("user1")"""
-    cur.execute(sql)
-    mydb.commit()
+    # https://www.w3schools.com/Python/python_mysql_insert.asp
+    # https://www.educative.io/answers/how-to-add-data-to-databases-in-flask
+    data_insert(mydb, cur, "users", "name", ("user1", ))  
+
 
     for page_num in [1,3,4,5,7]:
         continuous = page_info[page_num]['continuous']
@@ -123,22 +101,8 @@ def process_pdf():
             print("value: ", len(value), value)
             # value = (1, answers[0],answers[1])
             # value = (1, str(answer),)
-            if len(attribute.split()) == 2:
-                sql = """INSERT INTO """ + db_table + """(""" + attribute + """) VALUES (%s, %s)"""
-            elif len(attribute.split()) == 3:
-                sql = """INSERT INTO """ + db_table + """(""" + attribute + """) VALUES (%s, %s, %s)"""
-            elif len(attribute.split()) == 4:
-                sql = """INSERT INTO """ + db_table + """(""" + attribute + """) VALUES (%s, %s, %s, %s)"""
-            elif len(attribute.split()) == 5:
-                sql = """INSERT INTO """ + db_table + """(""" + attribute + """) VALUES (%s, %s, %s, %s, %s)"""
-            elif len(attribute.split()) == 6:
-                sql = """INSERT INTO """ + db_table + """(""" + attribute + """) VALUES (%s, %s, %s, %s, %s, %s)"""
-            # cur.execute(sql, ("abc",))
-            print(sql)
-            cur.execute(sql, value)
 
-    mydb.commit()
-
+            data_insert(mydb, cur, db_table, attribute, value)
     return redirect(url_for("view"))
 
 @app.route("/view")
