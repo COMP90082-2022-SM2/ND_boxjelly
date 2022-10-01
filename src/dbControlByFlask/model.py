@@ -1,15 +1,5 @@
 from exts import db
 
-
-"""class users(db.Model):
-    _id = db.Column("id", db.Integer, primary_key=True)
-    name = db.Column(db.String(10000))
-    email = db.Column(db.String(10000))
-    def __init__(self, name, email):
-        self.name = name
-        self.email = email"""
-
-
 class users(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(1000))
