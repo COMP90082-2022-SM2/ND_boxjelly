@@ -130,33 +130,32 @@ class DeEscalation(db.Model):
         self.postIncident = postIncident
 
 
-class ChemicalRestraint(db.Model):
+class Intervention(db.Model):
     id = db.Column("id", db.Integer, primary_key=True, autoincrement=True)
     user_id = db.Column('user_id', db.Integer, db.ForeignKey(users.id), primary_key=True)
-    ifProposed = db.Column(db.String(1000))
+    type = db.Column(db.String(1000))
+    ifProposed = db.Column(db.String(10))
+
+    def __init__(self, type, ifProposed):
+        self.type = type
+        self.ifProposed = ifProposed
+
+
+class ChemicalRestraint(db.Model):
+    id = db.Column("id", db.Integer, primary_key=True, autoincrement=True)
+    iv_id = db.Column('iv_id', db.Integer, db.ForeignKey(Intervention.id), primary_key=True)
     positiveStrategy = db.Column(db.Text)
     circumstance = db.Column(db.Text)
     procedure = db.Column(db.Text)
     howRestrainReduce = db.Column(db.Text)
     why = db.Column(db.Text)
 
-    def __init__(self,ifProposed, positiveStrategy, circumstance, procedure, howRestrainReduce, why):
-        self.ifProposed = ifProposed
+    def __init__(self, positiveStrategy, circumstance, procedure, howRestrainReduce, why):
         self.positiveStrategy = positiveStrategy
         self.circumstance = circumstance
         self.procedure = procedure
         self.howRestrainReduce = howRestrainReduce
         self.why = why
-
-
-class Intervention(db.Model):
-    id = db.Column("id", db.Integer, primary_key=True, autoincrement=True)
-    type = db.Column(db.String(1000))
-    cr_id = db.Column(db.Integer, db.ForeignKey(ChemicalRestraint.id), nullable=False)
-
-    def __init__(self, type, cr_id):
-        self.type = type
-        self.cr_id = cr_id
 
 
 class Medication(db.Model):
@@ -205,7 +204,7 @@ class Authorisation1(db.Model):
 
 class PhysicalRestraint(db.Model):
     id = db.Column("id", db.Integer, primary_key=True, autoincrement=True)
-    user_id = db.Column('user_id', db.Integer, db.ForeignKey(users.id), primary_key=True)
+    iv_id = db.Column('iv_id', db.Integer, db.ForeignKey(Intervention.id), primary_key=True)
     description = db.Column(db.Text)
     positiveStrategy = db.Column(db.Text)
     circumstance = db.Column(db.Text)
@@ -248,7 +247,7 @@ class Authorisation2(db.Model):
 
 class MechanicalRestraint(db.Model):
     id = db.Column("id", db.Integer, primary_key=True, autoincrement=True)
-    user_id = db.Column('user_id', db.Integer, db.ForeignKey(users.id), primary_key=True)
+    iv_id = db.Column('iv_id', db.Integer, db.ForeignKey(Intervention.id), primary_key=True)
     description = db.Column(db.Text)
     frequency = db.Column(db.String(1000))
     positiveStrategy = db.Column(db.Text)
@@ -293,7 +292,7 @@ class Authorisation3(db.Model):
 
 class EnvironmentalRestraint(db.Model):
     id = db.Column("id", db.Integer, primary_key=True, autoincrement=True)
-    user_id = db.Column('user_id', db.Integer, db.ForeignKey(users.id), primary_key=True)
+    iv_id = db.Column('iv_id', db.Integer, db.ForeignKey(Intervention.id), primary_key=True)
     description = db.Column(db.Text)
     frequency = db.Column(db.String(1000))
     positiveStrategy = db.Column(db.Text)
@@ -342,7 +341,7 @@ class Authorisation4(db.Model):
 
 class SeclusionRestraint(db.Model):
     id = db.Column("id", db.Integer, primary_key=True, autoincrement=True)
-    user_id = db.Column('user_id', db.Integer, db.ForeignKey(users.id), primary_key=True)
+    iv_id = db.Column('iv_id', db.Integer, db.ForeignKey(Intervention.id), primary_key=True)
     frequency = db.Column(db.String(1000))
     positiveStrategy = db.Column(db.Text)
     circumstance = db.Column(db.Text)

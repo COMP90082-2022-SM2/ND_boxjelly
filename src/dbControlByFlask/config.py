@@ -1,6 +1,8 @@
 # make sure the username, password and database name are correct
 username = 'root'
+# project_admin
 password = ''
+# comp90082@@
 userpass = 'mysql+pymysql://' + username + ':' + password + '@'
 # keep this as is for a hosted website
 server  = '127.0.0.1'
