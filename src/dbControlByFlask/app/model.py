@@ -1,4 +1,4 @@
-from exts import db
+from app.exts import db
 
 class users(db.Model):
     id = db.Column(db.Integer, primary_key=True)

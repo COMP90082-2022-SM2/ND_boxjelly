@@ -5,12 +5,12 @@ from datetime import timedelta
 from flask_sqlalchemy import SQLAlchemy
 import pymysql
 from sqlalchemy.sql import text
-from config import MysqlConfig, sqliteConfig
-from model import users, Assessment,ShortSummary, BAFunction, Goal, Strategies, Reinforcement, DeEscalation
-from exts import db, app
+# from config import MysqlConfig, sqliteConfig
+from app.model import users, Assessment,ShortSummary, BAFunction, Goal, Strategies, Reinforcement, DeEscalation
+from app.exts import db, app
 
-from pdf_reader import table_extraction, extract_answers, page_info
-from data_inserter import data_insert
+from app.pdf_reader import table_extraction, extract_answers, page_info
+from app.data_inserter import data_insert
 
 import pandas as pd
 from tabula import read_pdf
@@ -160,6 +160,6 @@ def logout():
     return redirect(url_for("login"))
 
 
-if __name__ == "__main__":
-    db.create_all()
-    app.run(debug=True)
+# if __name__ == "__main__":
+#     db.create_all()
+#     app.run(debug=True)
