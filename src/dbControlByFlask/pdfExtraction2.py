@@ -59,8 +59,12 @@ def extract_table(s,e,tables,start_index):
     for i in range(start_index,len(tables)):
         try:
             if s in tables[i]:
-                table_length = len(list(filter(None, tables[i+1])))
-                index = i+2
+                i+=1
+                if len(list(filter(None, tables[i]))) == 0:
+                    print("*************************************************")
+                    i+=1
+                table_length = len(list(filter(None, tables[i])))
+                index = i+1
                 while e not in tables[index]:
                     temp = []
                     for j in tables[index]:

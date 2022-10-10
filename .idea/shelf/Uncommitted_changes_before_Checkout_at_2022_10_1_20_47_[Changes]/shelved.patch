@@ -1,0 +1,17 @@
+Index: src/dbControlByFlask/pdf_reader.py
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+>from tabula import read_pdf\r\npage_info = {1: {\"continuous\": False, \"next_page\":True}, 3: {\"continuous\": False, \"next_page\":False}, \r\n    4: {\"continuous\": False, \"next_page\":False}, 5: {\"continuous\": True, \"next_page\":True}, \r\n    7: {\"continuous\": False, \"next_page\":True}}\r\n\r\n\r\ndef table_extraction(page_num):\r\n    filename = \"PBSP Summary Document Final.pdf\"\r\n\r\n    # Read the only the page no.4 of the file\r\n    tables = read_pdf(filename, pages=page_num, pandas_options={'header': None},\r\n                      multiple_tables=True, stream=True, lattice=True)\r\n\r\n    # Transform the result into a string table format\r\n    table_lists = []\r\n    for table in tables:\r\n        lists = [list(filter(lambda x: x == x, inner_list)) for inner_list in\r\n                 table.values.tolist()]  # delete all nan values\r\n        table_lists.append([e for e in lists if e])  # filter out empty lists\r\n    print(table_lists[0])\r\n    return table_lists\r\n\r\ndef extract_answers(table_lists):\r\n    answers_all = []\r\n    for table in table_lists:\r\n        i = 1\r\n        answers = []\r\n        while i < len(table):\r\n            if len(table[i-1]) == 1 and len(table[i]) == 1:\r\n                answers.append(str(table[i]))\r\n                # print(table[i]) #first index: how many tables in that page\r\n                i+=1\r\n            else:\r\n                if len(table) == 2: #sub-col name - value\r\n                    # insert the value as attribute directly\r\n                    print(\"aaa\")\r\n                else:\r\n                    # insert to another table\r\n                    print(\"bbb\", table[i])\r\n            i+=1\r\n        if len(answers) != 0:\r\n            answers_all.append(answers)\r\n    return answers_all\r\n
+===================================================================
+diff --git a/src/dbControlByFlask/pdf_reader.py b/src/dbControlByFlask/pdf_reader.py
+--- a/src/dbControlByFlask/pdf_reader.py	
++++ b/src/dbControlByFlask/pdf_reader.py	
+@@ -9,7 +9,7 @@
+ 
+     # Read the only the page no.4 of the file
+     tables = read_pdf(filename, pages=page_num, pandas_options={'header': None},
+-                      multiple_tables=True, stream=True, lattice=True)
++                      multiple_tables=True, stream=True, lattice=True,encoding='latin1')
+ 
+     # Transform the result into a string table format
+     table_lists = []

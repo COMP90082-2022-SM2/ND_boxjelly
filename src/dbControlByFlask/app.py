@@ -274,12 +274,12 @@ def get_user_information():
 
 @app.route("/process2", methods=["GET", "POST"])
 def process_pdf2():
-    file_name = "PBSP Summary Document (Draft V3 MV 170822) - Eddie (KN Model Plan) - No Comments.pdf"
+    file_name = "PBSP Summary Document Final.pdf"
     current_bold_position = 0
     current_table_position = 0
     current_text_position = 0
     # Page1
-    user_id = 8
+    user_id = 10
     dict_pdf, all_content, tables, bolds = extract.get_pdf_content(file_name)
     current_content = extract.extract_paragraph(
         "Provide a short summary about the person with disability who is the focus of the PBSP",
@@ -287,7 +287,7 @@ def process_pdf2():
     data_insert(mydb, cur, "short_summary", ("user_id, " + "summary"),
                 (user_id, current_content))
 
-    # Page2
+# Page2
     behavioural_assessment = extract.extract_paragraph(
         "Outline the behavioural assessment approaches implemented to develop this PBSP",
         "Additional non-behavioural assessments undertaken or reviewed to inform the development of this PBSP",
@@ -306,7 +306,9 @@ def process_pdf2():
     current_table = extract.extract_table(
         'Persons consulted to prepare this PBSP (add/remove rows as required)',
         'Outline the behavioural assessment approaches implemented to develop this PBSP',
-        tables, 0)
+        tables, current_table_position)
+    print(current_table)
+    current_table_position = current_table[1]
     for temp in current_table[0]:
         data_insert(mydb, cur, "persons_consulted",
                     ("who, " + "how, " + "assessment_id"),
@@ -339,9 +341,14 @@ def process_pdf2():
                 (user_id, str(function_name), descrip_behaviours, summary,
                  proposed_alternative))
     last_id = data_get_last_id(mydb, cur, "ba_function", user_id)[0][0]
+    print(tables[current_table_position:])
     stc = extract.extract_table(
         'Setting events, triggers and consequences related to these behaviours (add/remove rows as necessary)',
-        'A summary statement outlining the functional hypothesis', tables, 0)
+        'A summary statement outlining the functional hypothesis', tables, current_table_position)
+    current_table_position = stc[1]
+    print("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!")
+
+    print(stc)
     for temp in stc[0]:
 
         data_insert(
