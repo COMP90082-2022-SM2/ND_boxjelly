@@ -1,5 +1,5 @@
-import MySQLdb
 import json
+import mysql.connector
 
 def getPage1(cur,db,user_id):
     try:
@@ -11,7 +11,7 @@ def getPage1(cur,db,user_id):
         for result in rv:
             json_data.append(dict(zip(row_headers, result)))
         return json.dumps(json_data)
-    except (MySQLdb.Error,MySQLdb.Warning) as e:
+    except mysql.connector.Error as e:
         print(e)
         return None
 
@@ -26,7 +26,7 @@ def getPage2(cur,db,user_id):
         for result in rv:
             json_data.append(dict(zip(row_headers, result)))
         return json.dumps(json_data)
-    except (MySQLdb.Error,MySQLdb.Warning) as e:
+    except mysql.connector.Error as e:
         print(e)
         return None
 
@@ -35,13 +35,14 @@ def getPage3(cur,db,user_id):
         sql="SELECT * FROM ba_function ba JOIN stc s ON ba.id=s.f_id WHERE ba.user_id = "+str(user_id)
 
         cur.execute(sql)
+
         row_headers = [x[0] for x in cur.description]
         rv = cur.fetchall()
         json_data = []
         for result in rv:
             json_data.append(dict(zip(row_headers, result)))
         return json.dumps(json_data)
-    except (MySQLdb.Error,MySQLdb.Warning) as e:
+    except mysql.connector.Error as e:
         print(e)
         return None
 
@@ -60,7 +61,7 @@ def getPage4(cur,db,user_id):
         for result in rv:
             json_data.append(dict(zip(row_headers, result)))
         return json.dumps(json_data)
-    except (MySQLdb.Error,MySQLdb.Warning) as e:
+    except mysql.connector.Error as e:
         print(e)
         return None
 
@@ -73,7 +74,7 @@ def getPage5(cur,db,user_id):
                 "mechanicalRestraint":getMechanicalRestraint(cur,db,user_id),
                 "environmentalRestraint":getEnvironmentalRestraint(cur,db,user_id),
                 "seclusionRestraint":getSeclusionRestraint(cur,db,user_id)}
-    except (MySQLdb.Error,MySQLdb.Warning) as e:
+    except mysql.connector.Error as e:
         print(e)
         return None
 
@@ -88,7 +89,7 @@ def getAll(cur, db, user_id):
             "page5": getPage5(cur, db, user_id)
         }
 
-    except (MySQLdb.Error, MySQLdb.Warning) as e:
+    except mysql.connector.Error as e:
         print(e)
         return None
 
@@ -106,7 +107,7 @@ def getChemicalRestraint(cur,db,user_id):
         for result in rv:
             json_data.append(dict(zip(row_headers, result)))
         return json.dumps(json_data)
-    except (MySQLdb.Error, MySQLdb.Warning) as e:
+    except mysql.connector.Error as e:
         print(e)
         return None
 
@@ -123,7 +124,7 @@ def getPhysicalRestraint(cur,db,user_id):
         for result in rv:
             json_data.append(dict(zip(row_headers, result)))
         return json.dumps(json_data)
-    except (MySQLdb.Error, MySQLdb.Warning) as e:
+    except mysql.connector.Error as e:
         print(e)
         return None
 
@@ -140,7 +141,7 @@ def getMechanicalRestraint(cur,db,user_id):
         for result in rv:
             json_data.append(dict(zip(row_headers, result)))
         return json.dumps(json_data)
-    except (MySQLdb.Error, MySQLdb.Warning) as e:
+    except mysql.connector.Error as e:
         print(e)
         return None
 
@@ -157,7 +158,7 @@ def getEnvironmentalRestraint(cur,db,user_id):
         for result in rv:
             json_data.append(dict(zip(row_headers, result)))
         return json.dumps(json_data)
-    except (MySQLdb.Error, MySQLdb.Warning) as e:
+    except mysql.connector.Error as e:
         print(e)
         return None
 
@@ -174,7 +175,7 @@ def getSeclusionRestraint(cur,db,user_id):
         for result in rv:
             json_data.append(dict(zip(row_headers, result)))
         return json.dumps(json_data)
-    except (MySQLdb.Error, MySQLdb.Warning) as e:
+    except mysql.connector.Error as e:
         print(e)
         return None
 
@@ -185,7 +186,7 @@ def getPage6(cur,db,user_id):
         return {"Implementation":getImplementation(cur,db,user_id),
                 "SocialValidity":getSocialValidity(cur,db,user_id)
                 }
-    except (MySQLdb.Error,MySQLdb.Warning) as e:
+    except mysql.connector.Error as e:
         print(e)
         return None
 
@@ -204,7 +205,7 @@ def getImplementation(cur,db,user_id):
         for result in rv:
             json_data.append(dict(zip(row_headers, result)))
         return json.dumps(json_data)
-    except (MySQLdb.Error, MySQLdb.Warning) as e:
+    except mysql.connector.Error as e:
         print(e)
         return None
 
@@ -219,7 +220,7 @@ def getSocialValidity(cur,db,user_id):
         for result in rv:
             json_data.append(dict(zip(row_headers, result)))
         return json.dumps(json_data)
-    except (MySQLdb.Error,MySQLdb.Warning) as e:
+    except mysql.connector.Error as e:
         print(e)
         return None
 
