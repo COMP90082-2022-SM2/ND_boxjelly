@@ -302,9 +302,10 @@ class EnvironmentalRestraint(db.Model):
     procedure = db.Column(db.Text)
     impact = db.Column(db.String(1000))
     howImpact = db.Column(db.Text)
+    howRestraint = db.Column(db.Text)
     why = db.Column(db.Text)
 
-    def __init__(self, description, positiveStrategy, circumstance, procedure, howImpact, impact, why, frequency, person):
+    def __init__(self, description, positiveStrategy, circumstance, procedure, howImpact, impact, why, frequency, person, howRestraint):
         self.frequency = frequency
         self.description = description
         self.positiveStrategy = positiveStrategy
@@ -314,6 +315,7 @@ class EnvironmentalRestraint(db.Model):
         self.impact = impact
         self.person = person
         self.why = why
+        self.howRestraint = howRestraint
 
 
 class SocialValidity4(db.Model):
