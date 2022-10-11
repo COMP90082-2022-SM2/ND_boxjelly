@@ -65,7 +65,7 @@ cur = mydb.cursor()
 
 
 def table_extraction(page_num):
-    filename = "PBSP Summary Document Final.pdf"
+    filename = "PBSP Summary Document (Draft V3 MV 170822) - QLD Model Plan - No Comments.pdf"
 
     # Read the only the page no.4 of the file
     tables = read_pdf(filename,
@@ -268,7 +268,7 @@ def logout():
 
 @app.route("/getUserInfo", methods=["POST", "GET"])
 def get_user_information():
-    user_id = 2
+    user_id = 1
     return getAll(cur, mydb, user_id)
 
 
