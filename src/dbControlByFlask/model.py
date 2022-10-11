@@ -261,17 +261,19 @@ class MechanicalRestraint(db.Model):
     positiveStrategy = db.Column(db.Text)
     circumstance = db.Column(db.Text)
     procedure = db.Column(db.Text)
-    how = db.Column(db.Text)
+    howKnow = db.Column(db.Text)
+    howRestraint = db.Column(db.Text)
     why = db.Column(db.Text)
     score = db.Column(db.Integer)
 
-    def __init__(self, description, positiveStrategy, circumstance, procedure, how, why, frequency, score):
+    def __init__(self, description, positiveStrategy, circumstance, procedure, howKnow,howRestraint, why, frequency, score):
         self.frequency = frequency
         self.description = description
         self.positiveStrategy = positiveStrategy
         self.circumstance = circumstance
         self.procedure = procedure
-        self.how = how
+        self.howKnow = howKnow
+        self.howRestraint = howRestraint
         self.why = why
         self.score = score
 
@@ -311,10 +313,11 @@ class EnvironmentalRestraint(db.Model):
     procedure = db.Column(db.Text)
     impact = db.Column(db.String(1000))
     howImpact = db.Column(db.Text)
+    howRestraint = db.Column(db.Text)
     why = db.Column(db.Text)
     score = db.Column(db.Integer)
 
-    def __init__(self, description, positiveStrategy, circumstance, procedure, howImpact, impact, why
+    def __init__(self, description, positiveStrategy, circumstance, procedure, howImpact, howRestraint, impact, why
                  , frequency, person, score):
         self.frequency = frequency
         self.description = description
@@ -322,6 +325,7 @@ class EnvironmentalRestraint(db.Model):
         self.circumstance = circumstance
         self.procedure = procedure
         self.howImpact = howImpact
+        self.howRestraint = howRestraint
         self.impact = impact
         self.person = person
         self.why = why
@@ -471,33 +475,3 @@ class SocialV(db.Model):
         self.acceptability = acceptability
         self.who = who
         self.score = score
-
-
-"""class Case(db.Model):
-    __tablename__ = 'case'
-    id = db.Column(db.Integer, primary_key=True)
-    description = db.Column(db.String(100), nullable=False)
-    patient_id = db.Column(db.Integer, db.ForeignKey('patient.id'))
-    def __repr__(self):
-        return f'#{self.id}: {self.description} -> patient {self.patient_id}'
-class Patient(db.Model):
-    __tablename__ = 'patient'
-    id = db.Column(db.Integer, primary_key=True)
-    address = db.Column(db.String(100), nullable=False)
-    def __repr__(self):
-        return f'patient {self.id}'"""
-
-
-# class User(db.Model):
-#     __tablename__ = 'user'
-#     id = db.Column(db.INTEGER, primary_key=True)
-#     username = db.Column(db.String(80), unique=True)
-#     password = db.Column(db.String(80), nullable=False) # shouldn't be stored like this, should be encrypted first
-#
-#
-# class CodeCountRecord(db.Model):
-#     __tablename = 'codecountrecord'
-#     id = db.Column(db.INTEGER, primary_key=True)
-#     count = db.Column(db.INTEGER)
-#     data = db.Column(db.DATE)
-#     user = db.Column(db.ForeignKey('user.id'))
