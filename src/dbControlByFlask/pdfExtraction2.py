@@ -46,7 +46,6 @@ def extract_paragraph(start_string,end_string,all_content):
 
 def extract_paragraph_given_start(start_string,end_string,all_content,start_position):
     all_content_copy = copy.deepcopy(all_content[start_position:])
-    print(all_content_copy)
     start = all_content_copy.find(start_string)
     end = all_content_copy.find(end_string)
     current_content = all_content_copy[start+len(start_string):end]

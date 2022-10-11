@@ -1,15 +1,5 @@
 from exts import db
 
-
-"""class users(db.Model):
-    _id = db.Column("id", db.Integer, primary_key=True)
-    name = db.Column(db.String(10000))
-    email = db.Column(db.String(10000))
-    def __init__(self, name, email):
-        self.name = name
-        self.email = email"""
-
-
 class users(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(1000))
@@ -23,9 +13,11 @@ class ShortSummary(db.Model):
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
     user_id = db.Column(db.Integer, db.ForeignKey(users.id), primary_key=True, default=1)
     summary = db.Column(db.Text)
+    score = db.Column(db.Integer)
 
-    def __init__(self, summary):
+    def __init__(self, summary, score):
         self.summary = summary
+        self.score = score
 
 
 class Assessment(db.Model):
@@ -33,10 +25,12 @@ class Assessment(db.Model):
     user_id = db.Column(db.Integer, db.ForeignKey(users.id), primary_key=True)
     behaviouralAssessment = db.Column(db.Text)
     nonBehaviouralAssessment = db.Column(db.Text)
+    score = db.Column(db.Integer)
 
-    def __init__(self, behaviouralAssessment, nonBehaviouralAssessment):
+    def __init__(self, behaviouralAssessment, nonBehaviouralAssessment, score):
         self.behaviouralAssessment = behaviouralAssessment
         self.nonBehaviouralAssessment = nonBehaviouralAssessment
+        self.score = score
 
 
 class PersonsConsulted(db.Model):
@@ -58,12 +52,14 @@ class BAFunction(db.Model):
     description = db.Column(db.Text)
     summary = db.Column(db.Text)
     proposedAlternative = db.Column(db.Text)
+    score = db.Column(db.Integer)
 
-    def __init__(self, functionName, description, summary, proposedAlternative):
+    def __init__(self, functionName, description, summary, proposedAlternative, score):
         self.functionName = functionName
         self.description = description
         self.summary = summary
         self.proposedAlternative = proposedAlternative
+        self.score = score
 
 
 class STC(db.Model):
@@ -85,10 +81,12 @@ class Goal(db.Model):
     user_id = db.Column('user_id', db.Integer, db.ForeignKey(users.id), primary_key=True)
     behaviour = db.Column(db.Text)
     life = db.Column(db.Text)
+    score = db.Column(db.Integer)
 
-    def __init__(self, behaviour, life):
+    def __init__(self, behaviour, life, score):
         self.behaviour = behaviour
         self.life = life
+        self.score = score
 
 
 class Strategies(db.Model):
@@ -97,11 +95,13 @@ class Strategies(db.Model):
     environment = db.Column(db.Text)
     teaching = db.Column(db.Text)
     others = db.Column(db.Text)
+    score = db.Column(db.Integer)
 
-    def __init__(self, environment, teaching, others):
+    def __init__(self, environment, teaching, others, score):
         self.environment = environment
         self.teaching = teaching
         self.others = others
+        self.score = score
 
 
 class Reinforcement(db.Model):
@@ -110,11 +110,13 @@ class Reinforcement(db.Model):
     reinforcer = db.Column(db.String(10000))
     schedule = db.Column(db.Text)
     howIdentified = db.Column(db.Text)
+    score = db.Column(db.Integer)
 
-    def __init__(self, reinforcer, schedule, howIdentified):
+    def __init__(self, reinforcer, schedule, howIdentified, score):
         self.reinforcer = reinforcer
         self.schedule = schedule
         self.howIdentified = howIdentified
+        self.score = score
 
 
 class DeEscalation(db.Model):
@@ -123,40 +125,43 @@ class DeEscalation(db.Model):
     howtoPrompt = db.Column(db.Text)
     strategies = db.Column(db.Text)
     postIncident = db.Column(db.Text)
+    score = db.Column(db.Integer)
 
-    def __init__(self, howtoPrompt, strategies, postIncident):
+    def __init__(self, howtoPrompt, strategies, postIncident, score):
         self.howtoPrompt = howtoPrompt
         self.strategies = strategies
         self.postIncident = postIncident
+        self.score = score
+
+
+class Intervention(db.Model):
+    id = db.Column("id", db.Integer, primary_key=True, autoincrement=True)
+    user_id = db.Column('user_id', db.Integer, db.ForeignKey(users.id), primary_key=True)
+    type = db.Column(db.String(1000))
+    ifProposed = db.Column(db.String(10))
+
+    def __init__(self, type, ifProposed):
+        self.type = type
+        self.ifProposed = ifProposed
 
 
 class ChemicalRestraint(db.Model):
     id = db.Column("id", db.Integer, primary_key=True, autoincrement=True)
-    user_id = db.Column('user_id', db.Integer, db.ForeignKey(users.id), primary_key=True)
-    ifProposed = db.Column(db.String(1000))
+    iv_id = db.Column('iv_id', db.Integer, db.ForeignKey(Intervention.id), primary_key=True)
     positiveStrategy = db.Column(db.Text)
     circumstance = db.Column(db.Text)
     procedure = db.Column(db.Text)
     howRestrainReduce = db.Column(db.Text)
     why = db.Column(db.Text)
+    score = db.Column(db.Integer)
 
-    def __init__(self,ifProposed, positiveStrategy, circumstance, procedure, howRestrainReduce, why):
-        self.ifProposed = ifProposed
+    def __init__(self, positiveStrategy, circumstance, procedure, howRestrainReduce, why, score):
         self.positiveStrategy = positiveStrategy
         self.circumstance = circumstance
         self.procedure = procedure
         self.howRestrainReduce = howRestrainReduce
         self.why = why
-
-
-class Intervention(db.Model):
-    id = db.Column("id", db.Integer, primary_key=True, autoincrement=True)
-    type = db.Column(db.String(1000))
-    cr_id = db.Column(db.Integer, db.ForeignKey(ChemicalRestraint.id), nullable=False)
-
-    def __init__(self, type, cr_id):
-        self.type = type
-        self.cr_id = cr_id
+        self.score = score
 
 
 class Medication(db.Model):
@@ -205,21 +210,23 @@ class Authorisation1(db.Model):
 
 class PhysicalRestraint(db.Model):
     id = db.Column("id", db.Integer, primary_key=True, autoincrement=True)
-    user_id = db.Column('user_id', db.Integer, db.ForeignKey(users.id), primary_key=True)
+    iv_id = db.Column('iv_id', db.Integer, db.ForeignKey(Intervention.id), primary_key=True)
     description = db.Column(db.Text)
     positiveStrategy = db.Column(db.Text)
     circumstance = db.Column(db.Text)
     procedure = db.Column(db.Text)
     how = db.Column(db.Text)
     why = db.Column(db.Text)
+    score = db.Column(db.Integer)
 
-    def __init__(self, description, positiveStrategy, circumstance, procedure, how, why):
+    def __init__(self, description, positiveStrategy, circumstance, procedure, how, why, score):
         self.description = description
         self.positiveStrategy = positiveStrategy
         self.circumstance = circumstance
         self.procedure = procedure
         self.how = how
         self.why = why
+        self.score = score
 
 
 class SocialValidity2(db.Model):
@@ -248,23 +255,27 @@ class Authorisation2(db.Model):
 
 class MechanicalRestraint(db.Model):
     id = db.Column("id", db.Integer, primary_key=True, autoincrement=True)
-    user_id = db.Column('user_id', db.Integer, db.ForeignKey(users.id), primary_key=True)
+    iv_id = db.Column('iv_id', db.Integer, db.ForeignKey(Intervention.id), primary_key=True)
     description = db.Column(db.Text)
     frequency = db.Column(db.String(1000))
     positiveStrategy = db.Column(db.Text)
     circumstance = db.Column(db.Text)
     procedure = db.Column(db.Text)
-    how = db.Column(db.Text)
+    howKnow = db.Column(db.Text)
+    howRestraint = db.Column(db.Text)
     why = db.Column(db.Text)
+    score = db.Column(db.Integer)
 
-    def __init__(self, description, positiveStrategy, circumstance, procedure, how, why, frequency):
+    def __init__(self, description, positiveStrategy, circumstance, procedure, howKnow,howRestraint, why, frequency, score):
         self.frequency = frequency
         self.description = description
         self.positiveStrategy = positiveStrategy
         self.circumstance = circumstance
         self.procedure = procedure
-        self.how = how
+        self.howKnow = howKnow
+        self.howRestraint = howRestraint
         self.why = why
+        self.score = score
 
 
 class SocialValidity3(db.Model):
@@ -293,7 +304,7 @@ class Authorisation3(db.Model):
 
 class EnvironmentalRestraint(db.Model):
     id = db.Column("id", db.Integer, primary_key=True, autoincrement=True)
-    user_id = db.Column('user_id', db.Integer, db.ForeignKey(users.id), primary_key=True)
+    iv_id = db.Column('iv_id', db.Integer, db.ForeignKey(Intervention.id), primary_key=True)
     description = db.Column(db.Text)
     frequency = db.Column(db.String(1000))
     positiveStrategy = db.Column(db.Text)
@@ -304,18 +315,21 @@ class EnvironmentalRestraint(db.Model):
     howImpact = db.Column(db.Text)
     howRestraint = db.Column(db.Text)
     why = db.Column(db.Text)
+    score = db.Column(db.Integer)
 
-    def __init__(self, description, positiveStrategy, circumstance, procedure, howImpact, impact, why, frequency, person, howRestraint):
+    def __init__(self, description, positiveStrategy, circumstance, procedure, howImpact, howRestraint, impact, why
+                 , frequency, person, score):
         self.frequency = frequency
         self.description = description
         self.positiveStrategy = positiveStrategy
         self.circumstance = circumstance
         self.procedure = procedure
         self.howImpact = howImpact
+        self.howRestraint = howRestraint
         self.impact = impact
         self.person = person
         self.why = why
-        self.howRestraint = howRestraint
+        self.score = score
 
 
 class SocialValidity4(db.Model):
@@ -344,7 +358,7 @@ class Authorisation4(db.Model):
 
 class SeclusionRestraint(db.Model):
     id = db.Column("id", db.Integer, primary_key=True, autoincrement=True)
-    user_id = db.Column('user_id', db.Integer, db.ForeignKey(users.id), primary_key=True)
+    iv_id = db.Column('iv_id', db.Integer, db.ForeignKey(Intervention.id), primary_key=True)
     frequency = db.Column(db.String(1000))
     positiveStrategy = db.Column(db.Text)
     circumstance = db.Column(db.Text)
@@ -352,8 +366,9 @@ class SeclusionRestraint(db.Model):
     procedure = db.Column(db.Text)
     how = db.Column(db.Text)
     why = db.Column(db.Text)
+    score = db.Column(db.Integer)
 
-    def __init__(self, frequency, positiveStrategy, circumstance, maxFrequency, procedure, how, why):
+    def __init__(self, frequency, positiveStrategy, circumstance, maxFrequency, procedure, how, why, score):
         self.frequency = frequency
         self.maxFrequency = maxFrequency
         self.positiveStrategy = positiveStrategy
@@ -361,6 +376,7 @@ class SeclusionRestraint(db.Model):
         self.procedure = procedure
         self.how = how
         self.why = why
+        self.score = score
 
 
 class SocialValidity5(db.Model):
@@ -392,10 +408,12 @@ class Implementation(db.Model):
     user_id = db.Column('user_id', db.Integer, db.ForeignKey(users.id), primary_key=True)
     people = db.Column(db.String(1000))
     timeframe = db.Column(db.Text)
+    score = db.Column(db.Integer)
 
-    def __init__(self, people, timeframe):
+    def __init__(self, people, timeframe, score):
         self.people = people
         self.timeframe = timeframe
+        self.score = score
 
 
 class HowImplementer(db.Model):
@@ -451,37 +469,9 @@ class SocialV(db.Model):
     user_id = db.Column('user_id', db.Integer, db.ForeignKey(users.id), primary_key=True)
     acceptability = db.Column(db.Text)
     who = db.Column(db.Text)
+    score = db.Column(db.Integer)
 
-    def __init__(self, acceptability, who):
+    def __init__(self, acceptability, who, score):
         self.acceptability = acceptability
         self.who = who
-
-
-"""class Case(db.Model):
-    __tablename__ = 'case'
-    id = db.Column(db.Integer, primary_key=True)
-    description = db.Column(db.String(100), nullable=False)
-    patient_id = db.Column(db.Integer, db.ForeignKey('patient.id'))
-    def __repr__(self):
-        return f'#{self.id}: {self.description} -> patient {self.patient_id}'
-class Patient(db.Model):
-    __tablename__ = 'patient'
-    id = db.Column(db.Integer, primary_key=True)
-    address = db.Column(db.String(100), nullable=False)
-    def __repr__(self):
-        return f'patient {self.id}'"""
-
-
-# class User(db.Model):
-#     __tablename__ = 'user'
-#     id = db.Column(db.INTEGER, primary_key=True)
-#     username = db.Column(db.String(80), unique=True)
-#     password = db.Column(db.String(80), nullable=False) # shouldn't be stored like this, should be encrypted first
-#
-#
-# class CodeCountRecord(db.Model):
-#     __tablename = 'codecountrecord'
-#     id = db.Column(db.INTEGER, primary_key=True)
-#     count = db.Column(db.INTEGER)
-#     data = db.Column(db.DATE)
-#     user = db.Column(db.ForeignKey('user.id'))
+        self.score = score

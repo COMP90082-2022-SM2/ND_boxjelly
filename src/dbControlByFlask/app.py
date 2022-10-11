@@ -19,7 +19,7 @@ import io
 import os
 import mysql.connector
 import pdfExtraction2 as extract
-from data_inserter import data_insert, data_get_last_id
+from data_inserter import data_insert, data_get_last_id, data_get_last_id_by_intervention
 from read_db import getAll
 db.create_all()
 import sys
@@ -268,18 +268,19 @@ def logout():
 
 @app.route("/getUserInfo", methods=["POST", "GET"])
 def get_user_information():
-    user_id = 9
+    user_id = 2
     return getAll(cur, mydb, user_id)
 
 
 @app.route("/process2", methods=["GET", "POST"])
 def process_pdf2():
-    file_name = "PBSP Summary Document Final.pdf"
+
+    file_name = "PBSP Summary Document (Draft V3 MV 170822) - QLD Model Plan - No Comments.pdf"
     current_bold_position = 0
     current_table_position = 0
     current_text_position = 0
-    # Page1
-    user_id = 10
+# Page1
+    user_id = 1
     dict_pdf, all_content, tables, bolds = extract.get_pdf_content(file_name)
     current_content = extract.extract_paragraph(
         "Provide a short summary about the person with disability who is the focus of the PBSP",
@@ -361,29 +362,32 @@ def process_pdf2():
         "Goal(s) specific to the behaviours described",
         "Goals specific to enhancing the person’s quality of life",
         all_content)
-    goals_life = extract.extract_paragraph(
+    goals_life = extract.extract_paragraph_given_start(
         "Goals specific to enhancing the person’s quality of life",
-        "Strategies", all_content)
+        "Strategies", all_content,current_text_position)
+    current_text_position = goals_life[1]
     data_insert(mydb, cur, "goal", ("user_id, " + "behaviour, " + "life"),
-                (user_id, goals_behaviours, goals_life))
+                (user_id, goals_behaviours, goals_life[0]))
 
-    #strategy
-    environmental = extract.extract_paragraph(
+#strategy
+    environmental = extract.extract_paragraph_given_start(
         "Environmental changes to address setting events and triggers (changes to reduce and/or eliminate their influence)",
-        "Teaching of the alternative or functionally equivalent replacement behaviour(s) (e.g., description of the teaching \nstrategy and materials needed)",
-        all_content)
-    teaching = extract.extract_paragraph(
-        "Teaching of the alternative or functionally equivalent replacement behaviour(s) (e.g., description of the teaching \nstrategy and materials needed)",
+        "Teaching of the alternative or functionally equivalent replacement behaviour(s) (e.g., description of the teaching",
+        all_content,current_text_position)
+    current_text_position = environmental[1]
+    teaching = extract.extract_paragraph_given_start(
+        "strategy and materials needed)",
         "Other strategies (e.g., social, independence, coping, tolerance, etc.)",
-        all_content)
+        all_content,current_text_position)
+    current_text_position = teaching[1]
     others = extract.extract_paragraph(
         "Other strategies (e.g., social, independence, coping, tolerance, etc.)",
         "Reinforcement for Skill Development", all_content)
     data_insert(mydb, cur, "strategies",
                 ("user_id, " + "environment, " + "teaching, " + "others"),
-                (user_id, environmental, teaching, others))
+                (user_id, environmental[0], teaching[0], others))
 
-    #reinforcement
+#reinforcement
     reinforcer = extract.extract_paragraph("Proposed reinforcers",
                                            "Schedule of reinforcement",
                                            all_content)
@@ -399,7 +403,7 @@ def process_pdf2():
         ("user_id, " + "reinforcer, " + "schedule, " + "howIdentified"),
         (user_id, reinforcer, schedule, how_identified))
 
-    #DeEscalation
+#DeEscalation
 
     how_prompt = extract.extract_paragraph(
         "How to prompt the alternative or functionally replacement behaviour(s)",
@@ -423,7 +427,19 @@ def process_pdf2():
     # if has constraint
     temp = temp.split()
     if "Yes" in temp:
-        #chemical
+        types = ['Chemical', 'Physical', 'Mechanical', 'Environmental', 'Seclusion']
+        stored_types = []
+        for i in temp:
+            if i in types:
+                stored_types.append(i)
+        stored_types = str(stored_types)
+        data_insert(
+            mydb, cur, "intervention",
+            ("user_id, " + "type, " + "ifProposed"),
+            (user_id, stored_types, "yes"))
+        intervention_id = data_get_last_id(mydb, cur, "intervention",
+                                   user_id)[0][0]
+#chemical
         midication = extract.extract_table(
             'Medication(s) that will be used (e.g., name, dosage, frequency, administration, route, prescriber)',
             'Positive behavioural support strategies to be used before the PRN use of the medication',
@@ -462,12 +478,12 @@ def process_pdf2():
         current_table_position = authorisation[1]
         data_insert(
             mydb, cur, "chemical_restraint",
-            ("user_id, " + "positiveStrategy, " + "circumstance, " +
+            ("iv_id, " + "positiveStrategy, " + "circumstance, " +
              "chemical_restraint.procedure, " + "howRestrainReduce, " + "why"),
-            (user_id, positive_strategies, circumstance, procedure,
+            (intervention_id, positive_strategies, circumstance, procedure,
              how_restraint_reduce, why[0]))
-        last_id = data_get_last_id(mydb, cur, "chemical_restraint",
-                                   user_id)[0][0]
+        last_id = data_get_last_id_by_intervention(mydb, cur, "chemical_restraint",
+                                   intervention_id)[0][0]
         for temp in midication[0]:
             data_insert(
                 mydb, cur, "medication",
@@ -514,10 +530,10 @@ def process_pdf2():
             current_text_position)
         current_text_position = why[1]
         data_insert(mydb, cur, "physical_restraint",
-                    ("user_id, " + "description, " + "positiveStrategy, " +
+                    ("iv_id, " + "description, " + "positiveStrategy, " +
                      "circumstance, " + "physical_restraint.procedure, " +
                      "how, " + "why"),
-                    (user_id, description[0], positive_behaviour[0],
+                    (intervention_id, description[0], positive_behaviour[0],
                      circumstance[0], procedure[0], how[0], why[0]))
         social_validity = extract.extract_table(
             'Social validity of the restrictive practice',
@@ -529,8 +545,8 @@ def process_pdf2():
             'Description of the restraint(s) to be used', tables,
             current_table_position)
         current_table_position = authorisation[1]
-        last_id = data_get_last_id(mydb, cur, "physical_restraint",
-                                   user_id)[0][0]
+        last_id = data_get_last_id_by_intervention(mydb, cur, "physical_restraint",
+                                   intervention_id)[0][0]
 
         for temp in social_validity[0]:
             data_insert(mydb, cur, "social_validity2",
@@ -577,22 +593,22 @@ def process_pdf2():
             "How will the restraint be gradually reduced as behavioural goals are achieved by the person?",
             all_content, current_text_position)
         current_text_position = how_know[1]
-        how = extract.extract_paragraph_given_start(
+        how_restraint = extract.extract_paragraph_given_start(
             "How will the restraint be gradually reduced as behavioural goals are achieved by the person?",
             "Why is the use of this practice the least restrictive way of ensuring the safety of the person and/or others?",
             all_content, current_text_position)
-        current_text_position = how[1]
+        current_text_position = how_restraint[1]
         why = extract.extract_paragraph_given_start(
             "Why is the use of this restraint the least restrictive way of ensuring the safety of the person and/or others?",
             "Social validity of the restrictive practice", all_content,
             current_text_position)
         current_text_position = why[1]
         data_insert(mydb, cur, "mechanical_restraint",
-                    ("user_id, " + "description, " + "frequency, " +
+                    ("iv_id, " + "description, " + "frequency, " +
                      "positiveStrategy, " + "circumstance, " +
-                     "mechanical_restraint.procedure, " + "how, " + "why"),
-                    (user_id, description[0], frequency, positive_behaviour[0],
-                     circumstance[0], procedure[0], how[0], why[0]))
+                     "mechanical_restraint.procedure, " + "howKnow, " + "howRestraint, " + "why"),
+                    (intervention_id, description[0], frequency, positive_behaviour[0],
+                     circumstance[0], procedure[0], how_know[0], how_restraint[0], why[0]))
 
         social_validity = extract.extract_table(
             'Social validity of the practice',
@@ -604,8 +620,8 @@ def process_pdf2():
             'Description of the restraint(s) to be used', tables,
             current_table_position)
         current_table_position = authorisation[1]
-        last_id = data_get_last_id(mydb, cur, "mechanical_restraint",
-                                   user_id)[0][0]
+        last_id = data_get_last_id_by_intervention(mydb, cur, "mechanical_restraint",
+                                   intervention_id)[0][0]
 
         for temp in social_validity[0]:
             data_insert(mydb, cur, "social_validity3",
@@ -669,7 +685,6 @@ def process_pdf2():
             all_content, current_text_position)
         current_text_position = how_impact[1]
 
-        # !!!!!!!!!!!!!!! not used since there is no correspondent column in database
         how_restraint = extract.extract_paragraph_given_start(
             "How will the restraint be gradually reduced as behavioural goals are achieved by the person?",
             "Why is the use of this practice the least restrictive way of ensuring the safety of the person and/or others?",
@@ -682,13 +697,13 @@ def process_pdf2():
             current_text_position)
         current_text_position = why[1]
         data_insert(mydb, cur, "environmental_restraint",
-                    ("user_id, " + "description, " + "frequency, " +
+                    ("iv_id, " + "description, " + "frequency, " +
                      "positiveStrategy, " + "circumstance, " + "person, " +
                      "environmental_restraint.procedure, " + "impact, " +
-                     "howImpact, " + "why"),
-                    (user_id, description[0], frequency, positive_behaviour[0],
+                     "howImpact, " + "howRestraint, " + "why"),
+                    (intervention_id, description[0], frequency, positive_behaviour[0],
                      circumstance[0], person[0], procedure[0], impact,
-                     how_impact[0], why[0]))
+                     how_impact[0], how_restraint[0], why[0]))
 
         social_validity = extract.extract_table(
             'Social validity of the practice',
@@ -699,8 +714,8 @@ def process_pdf2():
             'Authorisation for the use of the practices', 'Frequency of use',
             tables, current_table_position)
         current_table_position = authorisation[1]
-        last_id = data_get_last_id(mydb, cur, "environmental_restraint",
-                                   user_id)[0][0]
+        last_id = data_get_last_id_by_intervention(mydb, cur, "environmental_restraint",
+                                   intervention_id)[0][0]
 
         for temp in social_validity[0]:
             data_insert(mydb, cur, "social_validity4",
@@ -758,10 +773,10 @@ def process_pdf2():
 
         data_insert(
             mydb, cur, "seclusion_restraint",
-            ("user_id, " + "frequency, " + "positiveStrategy, " +
+            ("iv_id, " + "frequency, " + "positiveStrategy, " +
              "circumstance, " + "maxFrequency, " +
              "seclusion_restraint.procedure, " + "how, " + "why"),
-            (user_id, frequency, positive_strategies[0], circumstance[0],
+            (intervention_id, frequency, positive_strategies[0], circumstance[0],
              max_frequency[0], procedure[0], how[0], why[0]))
 
         social_validity = extract.extract_table(
@@ -774,8 +789,8 @@ def process_pdf2():
             'People involved in the implementation of this PBSP', tables,
             current_table_position)
         current_table_position = authorisation[1]
-        last_id = data_get_last_id(mydb, cur, "seclusion_restraint",
-                                   user_id)[0][0]
+        last_id = data_get_last_id_by_intervention(mydb, cur, "seclusion_restraint",
+                                   intervention_id)[0][0]
 
         for temp in social_validity[0]:
             data_insert(mydb, cur, "social_validity5",
@@ -785,7 +800,13 @@ def process_pdf2():
             data_insert(mydb, cur, "authorisation5",
                         ("authorisationBody, " + "approvalPeriod, " + "sr_id"),
                         (tuple(temp + [last_id])))
-
+    else:
+        stored_types = []
+        stored_types = str(stored_types)
+        data_insert(
+            mydb, cur, "intervention",
+            ("user_id, " + "type, " + "ifProposed"),
+            (user_id, stored_types, "no"))
 #Page 6
     people = extract.extract_paragraph_given_start(
         "People involved in the implementation of this PBSP",

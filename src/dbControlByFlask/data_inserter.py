@@ -19,6 +19,8 @@ def data_insert(mydb, cur, db_table, attribute, value):
         sql = "INSERT INTO " + db_table + "(" + attribute + ") VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s)"
     elif len(attribute.split()) == 10:
         sql = "INSERT INTO " + db_table + "(" + attribute + ") VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s)"
+    elif len(attribute.split()) == 11:
+        sql = "INSERT INTO " + db_table + "(" + attribute + ") VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)"
     # cur.execute(sql, ("abc",))
     print(sql)
     cur.execute(sql, value)
@@ -26,6 +28,14 @@ def data_insert(mydb, cur, db_table, attribute, value):
 
 def data_get_last_id(mydb, cur,db_table,user_id):
     sql ="SELECT MAX(id) FROM "+db_table +" WHERE user_id = "+str(user_id)
+    print(sql)
+    cur.execute(sql)
+    id = cur.fetchall()
+    mydb.commit()
+    return id
+
+def data_get_last_id_by_intervention(mydb, cur,db_table,intervention_id):
+    sql ="SELECT MAX(id) FROM "+db_table +" WHERE iv_id = "+str(intervention_id)
     print(sql)
     cur.execute(sql)
     id = cur.fetchall()
