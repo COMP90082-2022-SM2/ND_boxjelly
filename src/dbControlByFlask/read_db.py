@@ -68,12 +68,12 @@ def getPage4(cur,db,user_id):
 # Page 5 lacks some information at beginning
 def getPage5(cur,db,user_id):
     try:
-
-        return {"chemicalRestraint":getChemicalRestraint(cur,db,user_id),
-                "physicalRestraint":getPhysicalRestraint(cur,db,user_id),
-                "mechanicalRestraint":getMechanicalRestraint(cur,db,user_id),
-                "environmentalRestraint":getEnvironmentalRestraint(cur,db,user_id),
-                "seclusionRestraint":getSeclusionRestraint(cur,db,user_id)}
+        iv_id = getInterventionId(cur, db, user_id)
+        return {"chemicalRestraint":getChemicalRestraint(cur,db,iv_id),
+                "physicalRestraint":getPhysicalRestraint(cur,db,iv_id),
+                "mechanicalRestraint":getMechanicalRestraint(cur,db,iv_id),
+                "environmentalRestraint":getEnvironmentalRestraint(cur,db,iv_id),
+                "seclusionRestraint":getSeclusionRestraint(cur,db,iv_id)}
     except mysql.connector.Error as e:
         print(e)
         return None
@@ -93,13 +93,25 @@ def getAll(cur, db, user_id):
         print(e)
         return None
 
-def getChemicalRestraint(cur,db,user_id):
+def getInterventionId(cur,db,user_id):
+    try:
+        sql = "SELECT MAX(id) FROM intervention i\
+                WHERE i.user_id = "+str(user_id)
+        cur.execute(sql)
+        row_headers = [x[0] for x in cur.description]
+        iv_id = cur.fetchall()
+        return int(iv_id[0][0])
+    except mysql.connector.Error as e:
+        print(e)
+        return None
+
+def getChemicalRestraint(cur,db,iv_id):
     try:
         sql = "SELECT * FROM chemical_restraint c\
                 JOIN medication m ON c.id=m.cr_id\
                 JOIN social_validity1 s on c.id=s.cr_id\
                 JOIN authorisation1 a on c.id=a.cr_id\
-                WHERE c.user_id = "+str(user_id)
+                WHERE c.iv_id = "+str(iv_id)
         cur.execute(sql)
         row_headers = [x[0] for x in cur.description]
         rv = cur.fetchall()
@@ -111,12 +123,12 @@ def getChemicalRestraint(cur,db,user_id):
         print(e)
         return None
 
-def getPhysicalRestraint(cur,db,user_id):
+def getPhysicalRestraint(cur,db,iv_id):
     try:
         sql = "SELECT * FROM physical_restraint p \
                 JOIN social_validity2 s on p.id=s.pr_id\
                 JOIN authorisation2 a on p.id=a.pr_id\
-                WHERE p.user_id = "+str(user_id)
+                WHERE p.iv_id = "+str(iv_id)
         cur.execute(sql)
         row_headers = [x[0] for x in cur.description]
         rv = cur.fetchall()
@@ -128,12 +140,12 @@ def getPhysicalRestraint(cur,db,user_id):
         print(e)
         return None
 
-def getMechanicalRestraint(cur,db,user_id):
+def getMechanicalRestraint(cur,db,iv_id):
     try:
         sql = "SELECT * FROM mechanical_restraint m \
                 JOIN social_validity3 s on m.id=s.mr_id\
                 JOIN authorisation3 a on m.id=a.mr_id\
-                WHERE m.user_id = "+str(user_id)
+                WHERE m.iv_id = "+str(iv_id)
         cur.execute(sql)
         row_headers = [x[0] for x in cur.description]
         rv = cur.fetchall()
@@ -145,12 +157,12 @@ def getMechanicalRestraint(cur,db,user_id):
         print(e)
         return None
 
-def getEnvironmentalRestraint(cur,db,user_id):
+def getEnvironmentalRestraint(cur,db,iv_id):
     try:
         sql = "SELECT * FROM environmental_restraint e\
                 JOIN social_validity4 s on e.id=s.er_id\
                 JOIN authorisation4 a on e.id=a.er_id\
-                WHERE e.user_id = "+str(user_id)
+                WHERE e.iv_id = "+str(iv_id)
         cur.execute(sql)
         row_headers = [x[0] for x in cur.description]
         rv = cur.fetchall()
@@ -162,12 +174,12 @@ def getEnvironmentalRestraint(cur,db,user_id):
         print(e)
         return None
 
-def getSeclusionRestraint(cur,db,user_id):
+def getSeclusionRestraint(cur,db,iv_id):
     try:
         sql = "SELECT * FROM seclusion_restraint sr\
                 JOIN social_validity5 s on sr.id=s.sr_id\
                 JOIN authorisation5 a on sr.id=a.sr_id\
-                WHERE sr.user_id ="+str(user_id)
+                WHERE sr.iv_id ="+str(iv_id)
         cur.execute(sql)
         row_headers = [x[0] for x in cur.description]
         rv = cur.fetchall()
