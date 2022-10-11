@@ -1,4 +1,3 @@
-import MySQLdb
 import json
 import mysql.connector
 
