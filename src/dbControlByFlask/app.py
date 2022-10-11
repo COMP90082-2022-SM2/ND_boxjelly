@@ -275,7 +275,7 @@ def get_user_information():
 @app.route("/process2", methods=["GET", "POST"])
 def process_pdf2():
 
-    file_name = "PBSP Summary Document (Draft V3 MV 170822) - QLD Model Plan - No Comments.pdf"
+    file_name = "PBSP Summary Document Final.pdf"
     current_bold_position = 0
     current_table_position = 0
     current_text_position = 0
@@ -600,7 +600,7 @@ def process_pdf2():
         current_text_position = how_restraint[1]
         why = extract.extract_paragraph_given_start(
             "Why is the use of this restraint the least restrictive way of ensuring the safety of the person and/or others?",
-            "Social validity of the restrictive practice", all_content,
+            "Social validity of the practice", all_content,
             current_text_position)
         current_text_position = why[1]
         data_insert(mydb, cur, "mechanical_restraint",
