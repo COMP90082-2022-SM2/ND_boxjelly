@@ -44,4 +44,14 @@ print(asgmt.submissions_download_url)
 
 zip_url = "https://canvas.lms.unimelb.edu.au/courses/"+course_id+"/assignments/"+asgmt_id+"/submissions?zip=1"
 
-web.open(zip_url, autoraise = False) # open the website and download the file
+# web.open(zip_url, autoraise = False) # open the website and download the file
+
+redirection_url = ""
+annotated_pdf_url = redirection_url[0:-5]+'annotated.pdf'
+print(annotated_pdf_url)
+r = requests.post(annotated_pdf_url)
+check_url = annotated_pdf_url+'/is_ready'
+while requests.get(check_url).content == '{"ready":false}':
+    sleep(1)
+r = requests.get(annotated_pdf_url)
+open('annotated.pdf', 'wb').write(r.content)
