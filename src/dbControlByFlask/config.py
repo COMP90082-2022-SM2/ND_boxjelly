@@ -2,11 +2,12 @@
 # username = 'root'
 # password = ''
 # userpass = 'mysql+pymysql://' + username + ':' + password + '@'
-username = 'b07a134d14b738'
-host = 'us-cdbr-east-06.cleardb.net'
-password = 'e9e9c4c8'
-database = 'heroku_7fff4db897f6863'
-userpass = 'mysql://b07a134d14b738:e9e9c4c8@us-cdbr-east-06.cleardb.net/heroku_7fff4db897f6863'
+# username = 'b07a134d14b738'
+# host = 'us-cdbr-east-06.cleardb.net'
+# password = 'e9e9c4c8'
+# database = 'heroku_7fff4db897f6863'
+userpass = 'mysql://bcad2e6d9226f9:318b6978@us-cdbr-east-06.cleardb.net/heroku_f7c500f08d32a48'
+# userpass = 'mysql://b07a134d14b738:e9e9c4c8@us-cdbr-east-06.cleardb.net/heroku_7fff4db897f6863'
 # keep this as is for a hosted website
 server  = '127.0.0.1:3306'
 # change to YOUR database name, with a slash added as shown
