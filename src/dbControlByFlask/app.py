@@ -266,16 +266,16 @@ def logout():
     return redirect(url_for("login"))
 
 
-@app.route("/getUserInfo", methods=["POST", "GET"])
-def get_user_information():
-    user_id = 1
+@app.route("/getUserInfo/<id>", methods=["POST", "GET"])
+def get_user_information(id):
+    user_id = int(id)
     return getAll(cur, mydb, user_id)
 
 
 @app.route("/process2", methods=["GET", "POST"])
 def process_pdf2():
 
-    file_name = "PBSP Summary Document Final.pdf"
+    file_name = "PBSP Summary Document (Draft V3 MV 170822) - QLD Model Plan - No Comments.pdf"
     current_bold_position = 0
     current_table_position = 0
     current_text_position = 0
@@ -296,19 +296,19 @@ def process_pdf2():
     non_behavioural_assessment = extract.extract_paragraph(
         "Additional non-behavioural assessments undertaken or reviewed to inform the development of this PBSP",
         "PAGE 3 – Functional Behavioural Assessment", all_content)
+    #stor the unique information in assessment table
     data_insert(
         mydb, cur, "assessment",
         ("user_id, " + "behaviouralAssessment, " + "nonBehaviouralAssessment"),
         (user_id, behavioural_assessment, non_behavioural_assessment))
 
-    #extract_table('Persons consulted to prepare this PBSP (add/remove rows as required)',
-    #             'Outline the behavioural assessment approaches implemented to develop this PBSP', tables, 0)
+    #get the latest assessment_id by given user_id
     last_id = data_get_last_id(mydb, cur, "assessment", user_id)[0][0]
     current_table = extract.extract_table(
         'Persons consulted to prepare this PBSP (add/remove rows as required)',
         'Outline the behavioural assessment approaches implemented to develop this PBSP',
         tables, current_table_position)
-    print(current_table)
+
     current_table_position = current_table[1]
     for temp in current_table[0]:
         data_insert(mydb, cur, "persons_consulted",
