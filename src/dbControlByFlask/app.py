@@ -21,6 +21,8 @@ import mysql.connector
 import pdfExtraction2 as extract
 from data_inserter import data_insert, data_get_last_id, data_get_last_id_by_intervention
 from read_db import getAll
+from werkzeug.utils import secure_filename
+
 db.create_all()
 import sys
 
@@ -63,6 +65,9 @@ mydb = mysql.connector.connect(host="localhost",
                                database="users")
 cur = mydb.cursor()
 
+user_id = 0
+
+current_pdf = None
 
 def table_extraction(page_num):
     filename = "PBSP Summary Document (Draft V3 MV 170822) - QLD Model Plan - No Comments.pdf"
@@ -211,6 +216,31 @@ def view():
                            de_escalation_table=de_escalation_table)
     # return render_template("view.html", values=users.query.all())  # get all the users and pass as objects to value
 
+@app.route("/upload")
+def upload():
+
+    user = session.get("user")
+    found_user = users.query.filter_by(
+        name=user).first()
+    print(found_user)
+    global user_id
+    user_id = found_user.id
+    return render_template('upload.html')
+
+
+@app.route('/uploader',methods=['GET','POST'])
+def uploader():
+    if request.method == 'POST':
+        global current_pdf
+        current_pdf = request.files['file']
+        #print(request.files)
+        #f.save(os.path.join(app.config['UPLOAD_FOLDER'], secure_filename(f.filename)))
+
+        #return 'file uploaded successfully'
+        return redirect(url_for("process_pdf2"))
+    else:
+
+        return render_template('upload.html')
 
 @app.route("/login", methods=["POST", "GET"])
 def login():
@@ -247,6 +277,7 @@ def user():
             found_user.email = email
             db.session.commit()  # commit user's email
             flash("email is saved")
+            return redirect(url_for("upload"))
         else:
             if "email" in session:
                 email = session["email"]
@@ -275,13 +306,12 @@ def get_user_information(id):
 @app.route("/process2", methods=["GET", "POST"])
 def process_pdf2():
 
-    file_name = "PBSP Summary Document (Draft V3 MV 170822) - QLD Model Plan - No Comments.pdf"
+    #file_name = "PBSP Summary Document (Draft V3 MV 170822) - QLD Model Plan - No Comments.pdf"
     current_bold_position = 0
     current_table_position = 0
     current_text_position = 0
 # Page1
-    user_id = 1
-    dict_pdf, all_content, tables, bolds = extract.get_pdf_content(file_name)
+    dict_pdf, all_content, tables, bolds = extract.get_pdf_content(current_pdf.filename)
     current_content = extract.extract_paragraph(
         "Provide a short summary about the person with disability who is the focus of the PBSP",
         "PAGE 2 – Assessments and Data Gathering", all_content)
