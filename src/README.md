@@ -1,21 +1,39 @@
+# Getting Started with Flask Backend
+## Installation and Configuration
 
-## Instructions
-Connection with MySQL Database uses Socket (easier to visualize data) 
- 1.  download XAMPP: https://www.apachefriends.org/download.html
- 2.  in XAMPP: Manage Servers -> start MySQL Database
- 3.  To view database: http://localhost/phpmyadmin/
+1. Python Flask App Deployment
+1.1 Project Initialization
+1.1.1 Environment & Repository Set-up
+cd src
+Set up a Python Virtual Environment: python3 -m venv dbControlByFlask
+Activate the Virtual Environment: source dbControlByFlask/bin/activate
+cd dbControlByFlask
+Install Dependencies: pip3 install Flask
+Install Heroku plugins
+heroku plugins:install buildpack-registry
+heroku plugins:install buildpacks
+Heroku Python & Java buildpacks required: 
+heroku buildpacks:set heroku/python (This detects your app as Python)
+heroku buildpacks:add heroku/java ('Tabula' library requires Java runtime on the environment)
+Initialize the Git Repository: git init
+heroku login
+Clone the repo: heroku git:clone -a db-control-by-flask2
 
-* Can use sqlite for development
+1.1.2 Heroku Deployment Set-up
+Create a text file listing project dependencies/packages: pip3 freeze > requirements.txt
+Create Procfile tell Heroku how the Python app will be running: nano Procfile  -use Gunicorn (a Web Server Gateway Interface HTTP Server) as it's compatible with Flask
 
-Testing options
-- Postman: localhost:5000/process
-- Broswer: localhost:5000/process
+1.2 Deploy the app using Heroku pipelines
+（Use Git to manage changes)
 
-## Folder Structure
- 
-### dbControlbyFlask
-- backend + database connection
+heroku login
+git add .
+git commit -am "make it better"
+git branch: to check which branch you are currently on              
+git push heroku Sophie:master (Push the git repo to the Heroku remote ‘master’ branch)
 
-### Project_database.drawio.png
-- Data Model Design Diagram
-
+### API
+| Urls                                   | Request Method | Purpose                        |
+| -------------------------------------- | -------------- | ------------------------------ |
+| /process                               | GET            | Extract texts                  |
+| /view                                  | GET            | View results                   |
