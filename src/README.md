@@ -31,3 +31,7 @@ Heroku Python & Java buildpacks required:
 | -------------------------------------- | -------------- | ------------------------------ |
 | /process                               | GET            | Extract texts                  |
 | /view                                  | GET            | View results                   |
+
+## Reference 
+[Flask Documentation](https://flask.palletsprojects.com/en/2.2.x/)
+[Heroku Documentation](https://devcenter.heroku.com/)
