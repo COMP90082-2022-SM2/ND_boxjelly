@@ -26,6 +26,8 @@ import sys
 
 from sqlalchemy import create_engine, inspect
 
+from read_from_db import getPage1
+
 table_dict = {1: [("short_summary", "user_id, summary")], 
     3:[("assessment", "user_id, behaviouralAssessment, nonBehaviouralAssessment")], 
     4:[("ba_function", "user_id, functionName"), ("ba_function", "user_id, description, summary, proposedAlternative")], 
@@ -86,8 +88,8 @@ def home():
 @app.route("/process", methods=["GET", "POST"])
 def process_pdf():
     engine = create_engine('mysql://bcad2e6d9226f9:318b6978@us-cdbr-east-06.cleardb.net/heroku_f7c500f08d32a48')
-    inspector=inspect(engine)
-    print(inspector.has_table('user'))
+    inspector=inspect(engine) 
+    print(inspector.has_table('user'))  
     if inspector.has_table('user') == False: # if tables haven't created yet, create all tables based on db.model
         db.create_all()
     # https://www.w3schools.com/Python/python_mysql_insert.asp
@@ -213,15 +215,21 @@ def process_pdf():
                 sub_col_answers_all.append(next_sub_answers[i]) #append next page's sub-col table texts to all sub-col=answers
             
             sub_column_data_insert(mydb, cur, page_num, sub_column_table_info, sub_col_answers_all)               
-                                           
+
     cur.close()
     db.session.close()
+    # dict1 = getPage1(cur, mydb, 4)
+    #return dict1
     return "successful"
-    return redirect(url_for("view"))
+    # for testing/reading from database requirement
+    #return redirect(url_for("view"))
 
-
-# @app.route("/view")
-# def view():
+@app.route("/view")
+def view():
+    dict1 = getPage1(cur, mydb, 4)
+    cur.close()
+    db.session.close()
+    return dict1
 #     # https://www.digitalocean.com/community/tutorials/how-to-use-templates-in-a-flask-application
 #     # https://stackoverflow.com/questions/18150144/how-to-query-a-database-after-render-template
 #     # cur.execute("SELECT * FROM short_summary")
@@ -242,54 +250,57 @@ def process_pdf():
 #     strategies_table=strategies_table, reinforcement_table=reinforcement_table, de_escalation_table=de_escalation_table)
 #     # return render_template("view.html", values=users.query.all())  # get all the users and pass as objects to value
 
+@app.route("/login", methods=["POST", "GET"])
+def login():
+    if request.method == "POST":
+        # session.permanent = True
+        user = request.form["nm"]
+        # session["user"] = user
+
+        # found_user = Users.query.filter_by(name=user).first()  # users -the model
+        # if found_user:
+        #     session["email"] = found_user.email
+        # else:
+            #usr = Users(user, "")
+            # db.session.add(usr)  # staging
+            # db.session.commit()  # adding to the db
+        return redirect(url_for("process"))
+        #return redirect(url_for("user"))
+    else:
+        if "user" in session:
+            return redirect(url_for("process"))
+            #return redirect(url_for("user"))
+        return render_template("login.html")
+
+
+@app.route("/user", methods=["POST", "GET"])
+def user():
+    email = None
+    if "user" in session:  # have logged in, get it from the session variable
+        user = session["user"]
+
+        if request.method == "POST":
+            email = request.form["email"]
+            session["email"] = email  # save the email to the session
+            found_user = Users.query.filter_by(name=user).first()
+            found_user.email = email
+            #data_insert(mydb, cur, "users", "name", ("user1", ))
+            #db.session.commit()  # commit user's email
+            flash("email is saved")
+        else:
+            if "email" in session:
+                email = session["email"]
+        return redirect(url_for("process"))
+        #return render_template("user.html", email=email)
+    else:  # haven't logged in or left the browser
+        flash("You are not logged in")
+        return redirect(url_for("login"))
+
 if __name__ == "__main__":
     db.create_all()
     app.run(debug=True)
     print(app.logger.addHandler(logging.StreamHandler(sys.stdout)))
     print(app.logger.setLevel(logging.ERROR))
-# @app.route("/login", methods=["POST", "GET"])
-# def login():
-#     if request.method == "POST":
-#         # session.permanent = True
-#         user = request.form["nm"]
-#         session["user"] = user
-
-#         found_user = Users.query.filter_by(name=user).first()  # users -the model
-#         if found_user:
-#             session["email"] = found_user.email
-#         else:
-#             usr = Users(user, "")
-#             db.session.add(usr)  # staging
-#             db.session.commit()  # adding to the db
-#         return redirect(url_for("user"))
-#     else:
-#         if "user" in session:
-#             return redirect(url_for("user"))
-#         return render_template("login.html")
-
-
-# @app.route("/user", methods=["POST", "GET"])
-# def user():
-#     email = None
-#     if "user" in session:  # have logged in, get it from the session variable
-#         user = session["user"]
-
-#         if request.method == "POST":
-#             email = request.form["email"]
-#             session["email"] = email  # save the email to the session
-#             found_user = Users.query.filter_by(name=user).first()
-#             found_user.email = email
-#             db.session.commit()  # commit user's email
-#             flash("email is saved")
-#         else:
-#             if "email" in session:
-#                 email = session["email"]
-#         return render_template("user.html", email=email)
-#     else:  # haven't logged in or left the browser
-#         flash("You are not logged in")
-#         return redirect(url_for("login"))
-
-
 # @app.route("/logout")
 # def logout():
 #     if "user" in session:
