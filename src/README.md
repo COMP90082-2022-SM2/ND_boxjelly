@@ -1,9 +1,8 @@
 # Getting Started with Flask Backend
-## Installation and Configuration
 
-1. Python Flask App Deployment
-1.1 Project Initialization
-1.1.1 Environment & Repository Set-up
+## Python Flask App Deployment
+### Project Initialization
+#### Environment & Repository Set-up
 cd src
 Set up a Python Virtual Environment: python3 -m venv dbControlByFlask
 Activate the Virtual Environment: source dbControlByFlask/bin/activate
@@ -19,11 +18,11 @@ Initialize the Git Repository: git init
 heroku login
 Clone the repo: heroku git:clone -a db-control-by-flask2
 
-1.1.2 Heroku Deployment Set-up
+#### Heroku Deployment Set-up
 Create a text file listing project dependencies/packages: pip3 freeze > requirements.txt
 Create Procfile tell Heroku how the Python app will be running: nano Procfile  -use Gunicorn (a Web Server Gateway Interface HTTP Server) as it's compatible with Flask
 
-1.2 Deploy the app using Heroku pipelines
+### Deploy the app using Heroku pipelines
 （Use Git to manage changes)
 
 heroku login
@@ -32,7 +31,7 @@ git commit -am "make it better"
 git branch: to check which branch you are currently on              
 git push heroku Sophie:master (Push the git repo to the Heroku remote ‘master’ branch)
 
-### API
+## API
 | Urls                                   | Request Method | Purpose                        |
 | -------------------------------------- | -------------- | ------------------------------ |
 | /process                               | GET            | Extract texts                  |
