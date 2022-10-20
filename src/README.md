@@ -8,7 +8,8 @@
 3. Activate the Virtual Environment: ```source dbControlByFlask/bin/activate```
 4. ```cd dbControlByFlask```
 5. Install Dependencies: ```pip3 install Flask```
-##### Install Heroku plugins
+
+Install Heroku plugins
 1. ```heroku plugins:install buildpack-registry```
 2. ```heroku plugins:install buildpacks```
 
