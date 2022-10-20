@@ -199,7 +199,7 @@ class SocialValidity1(db.Model):
 
 class Authorisation1(db.Model):
     id = db.Column("id", db.Integer, primary_key=True, autoincrement=True)
-    authorisationBody = db.Column(db.String(1000))
+    authorisingBody = db.Column(db.String(1000))
     approvalPeriod = db.Column(db.String(1000))
     chemical_restraint_id = db.Column(db.Integer, db.ForeignKey(ChemicalRestraint.id), nullable=False)
 
@@ -244,7 +244,7 @@ class SocialValidity2(db.Model):
 
 class Authorisation2(db.Model):
     id = db.Column("id", db.Integer, primary_key=True, autoincrement=True)
-    authorisationBody = db.Column(db.String(1000))
+    authorisingBody = db.Column(db.String(1000))
     approvalPeriod = db.Column(db.String(1000))
     physical_restraint_id = db.Column(db.Integer, db.ForeignKey(PhysicalRestraint.id), nullable=False)
 
@@ -293,7 +293,7 @@ class SocialValidity3(db.Model):
 
 class Authorisation3(db.Model):
     id = db.Column("id", db.Integer, primary_key=True, autoincrement=True)
-    authorisationBody = db.Column(db.String(1000))
+    authorisingBody = db.Column(db.String(1000))
     approvalPeriod = db.Column(db.String(1000))
     mechanical_restraint_id = db.Column(db.Integer, db.ForeignKey(MechanicalRestraint.id), nullable=False)
 
@@ -347,7 +347,7 @@ class SocialValidity4(db.Model):
 
 class Authorisation4(db.Model):
     id = db.Column("id", db.Integer, primary_key=True, autoincrement=True)
-    authorisationBody = db.Column(db.String(1000))
+    authorisingBody = db.Column(db.String(1000))
     approvalPeriod = db.Column(db.String(1000))
     environmental_restraint_id = db.Column(db.Integer, db.ForeignKey(EnvironmentalRestraint.id), nullable=False)
 
@@ -394,7 +394,7 @@ class SocialValidity5(db.Model):
 
 class Authorisation5(db.Model):
     id = db.Column("id", db.Integer, primary_key=True, autoincrement=True)
-    authorisationBody = db.Column(db.String(1000))
+    authorisingBody = db.Column(db.String(1000))
     approvalPeriod = db.Column(db.String(1000))
     seclusion_restraint_id = db.Column(db.Integer, db.ForeignKey(SeclusionRestraint.id), nullable=False)
 
