@@ -7,7 +7,7 @@
 2. Set up a Python Virtual Environment: ```python3 -m venv dbControlByFlask```
 3. Activate the Virtual Environment: ```source dbControlByFlask/bin/activate```
 4. ```cd dbControlByFlask```
-5. Install Dependencies: ```pip3 install Flask```
+5. Install Dependencies: ```pip3 install Flask``` ```pip3 install canvasapi```
 
 Install Heroku plugins
 1. ```heroku plugins:install buildpack-registry```
@@ -36,3 +36,5 @@ Heroku Python & Java buildpacks required:
 [Flask Documentation](https://flask.palletsprojects.com/en/2.2.x/)
 
 [Heroku Documentation](https://devcenter.heroku.com/)
+
+[Canvas API Documentation](https://github.com/agogear/canvasdashboards/blob/main/docs/CanvasAPI.md)

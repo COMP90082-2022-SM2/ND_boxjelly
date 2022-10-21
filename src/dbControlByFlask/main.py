@@ -215,10 +215,9 @@ def process_pdf():
                 sub_col_answers_all.append(next_sub_answers[i]) #append next page's sub-col table texts to all sub-col=answers
             
             sub_column_data_insert(mydb, cur, page_num, sub_column_table_info, sub_col_answers_all)               
-
+    #dict1 = getPage1(cur, mydb, 4)
     cur.close()
     db.session.close()
-    # dict1 = getPage1(cur, mydb, 4)
     #return dict1
     return "successful"
     # for testing/reading from database requirement

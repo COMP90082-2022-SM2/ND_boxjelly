@@ -28,7 +28,7 @@ bolded_lst = [p.getText(strip=True) for p in bolded]
 print(bolded_lst)
 
 def table_extraction(page_num):
-    filename = "PBSP Summary Document Final.pdf"
+    filename = "PBSP Summary Document Final.pdf"   
 
     # Read the only the page no.4 of the file
     tables = read_pdf(filename, pages=page_num, pandas_options={'header': None},
