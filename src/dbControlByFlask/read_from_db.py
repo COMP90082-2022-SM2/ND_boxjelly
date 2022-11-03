@@ -16,6 +16,7 @@ def getPage1(cur, db, user_id):
             "WHERE id = (SELECT MAX(id) from `short_summary` WHERE user_id = {})".format(user_id)
     cur.execute(sql)
     paragraph = get_json_format(cur)
+    print("paragraph", paragraph)
     page1 = dict(json.loads(paragraph)[0])
     return page1
     # except mysql.connector.Error as e:
