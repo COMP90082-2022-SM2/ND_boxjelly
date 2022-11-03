@@ -1,1 +1,1 @@
-#Positive Behaviour Support Plan Samples go here
+#Positive Behaviour Support Plan Document Sample
