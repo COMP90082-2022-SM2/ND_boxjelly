@@ -18,10 +18,6 @@ app.config.from_object(MysqlConfig)
 app.permanent_session_lifetime = timedelta(minutes=1)
 db = SQLAlchemy(app)
 
-
-# db.create_all()
-
-
 @app.route("/")
 def home():
     return render_template("index.html")

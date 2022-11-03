@@ -7,6 +7,8 @@ from pdfminer.layout import LAParams
 
 from bs4 import BeautifulSoup
 
+# Explanation in "PDF Extraction" under Implementation tag
+# page_info: require adjustments for different PDFs
 page_info = {1: {"continuous": True, "next_page":False}, 3: {"continuous": False, "next_page":False}, 
     4: {"continuous": False, "next_page":False}, 5: {"continuous": True, "next_page":True}, 
     7: {"continuous": False, "next_page":True}, 9: {"continuous": False, "next_page":True}, 
@@ -20,7 +22,6 @@ with open('PBSP Summary Document Final.pdf', 'rb') as fin:
     extract_text_to_fp(fin, output_string, laparams=LAParams(),output_type='html', codec=None)
 
 output = output_string.getvalue().strip()
-# print(output)
 soup = BeautifulSoup(output, "html5lib")
 
 bolded = soup.find_all("span", {"style": "font-family: Calibri-Bold; font-size:11px"})
@@ -28,9 +29,13 @@ bolded_lst = [p.getText(strip=True) for p in bolded]
 print(bolded_lst)
 
 def table_extraction(page_num):
+    """
+    read tables page by page
+    return: texts in the tables in nested list format
+    """
     filename = "PBSP Summary Document Final.pdf"   
 
-    # Read the only the page no.4 of the file
+    # Read the only the page no. of the file
     tables = read_pdf(filename, pages=page_num, pandas_options={'header': None},
                       multiple_tables=True, stream=True, lattice=True)
 
@@ -43,6 +48,12 @@ def table_extraction(page_num):
     return table_lists
 
 def extract_answers(table_lists):
+    """
+    extract texts from tables
+    return: 
+        answers_all: texts from single-columned tables
+        sub_col_answers_all: texts from multi-columned tables
+    """
     answers_all = []
     sub_col_answers_all = []
     for table in table_lists:
@@ -52,7 +63,7 @@ def extract_answers(table_lists):
         while i < len(table):
             if len(table[i]) == 1:
                 answers.append(str(table[i]))
-                #print("answers:", str(table[i])) #first index: how many tables in that page
+                 #first index: how many tables in that page
                 i+=1
             elif len(table[i]) > 1: 
                 if len(table[i-1]) == 1:
@@ -67,7 +78,6 @@ def extract_answers(table_lists):
                         sub_col_answers.append(table[i])
                         if i+1 == len(table) or len(table[i+1]) == 1:
                             if sub_col_answers:
-                                #print("``````", sub_col_answers)
                                 sub_col_answers_all.append(sub_col_answers) # the end of the sub-col table
                                 sub_col_answers = []
                             i+=1                         
@@ -77,7 +87,6 @@ def extract_answers(table_lists):
                     elif i+1 == len(table) or len(table[i+1]) == 1:
                         sub_col_answers.append(table[i])
                         if sub_col_answers:
-                            #print("~~~~~~~`", sub_col_answers)
                             sub_col_answers_all.append(sub_col_answers) # the end of the sub-col table
                             sub_col_answers = []
                         i+=1
@@ -85,6 +94,5 @@ def extract_answers(table_lists):
         if len(answers) != 0:
             answers_all.append(answers)
         if len(sub_col_answers) != 0:
-            #print("************", i, sub_col_answers)
             sub_col_answers_all.append(sub_col_answers) # the end of a whole table
     return answers_all, sub_col_answers_all
