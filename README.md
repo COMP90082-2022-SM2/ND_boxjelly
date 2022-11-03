@@ -1,35 +1,28 @@
-# COMP90082_2022_SM2_ND_boxjelly
+# Introduction
+This is another version of code to extract content from PDF which has not been deployed. This version can automatically extract all the content from a PDF in the given format. We mainly use the titles in the PDF to locate the information that we want and store the content in the MySQL Database. 
 
-## Project Description 
-
-### Background
-
-This project is developed to enhance practitioners' ability to provide quality Behaviour Support Plans (BSPs) that are consistent with legislation, policy, and good clinical practice, i.e., report requirements of the National Disability Insurance Scheme (NDIS). The proposed methodology is to provide education and supporting resources through the Canvas LMS platform to upskill the relevant workforces and integrate artificial intelligence (AI) to allow the workforce to self-examine through the provision of AI-generated feedback. 
-
-### Problem Domain
-
-The proposed AI agents' training will require enormous data input and the data will be generated through the submission of the practitioners who attended the Canvas LMS module. The raw data as the committed submissions will be in PDF format, hence cannot be used directly for downstream tasks such as AI training. Meanwhile, the information contained in the raw submission should be extracted and organized in efficient formats, so they can be stored and maintained properly within a database. Given the scope of the project, there would be ongoing data input from practitioners through their daily work, therefore, the database should be scalable with the increasing demand.   
-
-### Client Goals
-
-The project team intended to provide feasible solutions to the described problem domain. The following lists the goal of the project:
-
-- implement APIs to receive the submission of the Canvas LMS users efficiently and timely
-- extract key information from the raw submission and clean the data before storing them in a structured format in the database
-- design a reliable, scalable, and maintainable database 
-- provide easily accessible APIs to the base for other downstream tasks
-
-## Github repo
-
-├── docs/                    # Documentation files (Includes requirements, confluence export etc)
-
-├── src/                       # src code
-
-├── tests/                    # User/system tests
-
-├── prototypes/low fidelity/     # low fidelity files (screens, mockups etc)
-
-├── prototypes/high fidelity/     # high fidelity files (screens, source files etc)
+# Setup
+## Download XAMPP
+1.	download XAMPP: https://www.apachefriends.org/download.html
+2.	in XAMPP: Manage Servers -> start MySQL Database
+3.	To view database: http://localhost/phpmyadmin/
 
 
-├── data samples/      # Includes Positive Behaviour Support Plan (PBSP) samples
+## Install all the packages required to run this project use the code:
+pip install -r requirements.txt
+
+# Run
+1.	open the XAMPP and start both Apache and MySQL.
+ 
+2.	get into folder dbControlByFlask and use the command **python app.py** to run the project.
+ 
+
+3.	Open the browser and enter the url: http://127.0.0.1:5000/login
+Enter a username and a email to login.
+
+4.	Choose a PDF that has the same format as the PDFs in the folder dbControlByFlask and click submit.
+
+5.	We can see the browser will automatically jump to http://localhost:5000/process2 which shows the content in the PDF just submitted in the form of JSON.
+
+6.	Then we can check whether the data has been stored correctly in the database by entering http://localhost/phpmyadmin/. The data is stored in the database called users.
+ 
