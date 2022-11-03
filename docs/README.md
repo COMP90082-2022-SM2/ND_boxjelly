@@ -1,13 +1,17 @@
 # Documentation files
 
-- Spint1
-- Sprint2
-- Sprint3
-  - part1
-  - part2
-  - part3
-- Sprint4
-  - part1
-  - part2
-  - part3
+- Sprint1 Confluence Export
+
+- Sprint2 Confluence Export
+
+- Sprint3 Confluence Export
+  - part1: Requirements+Architecture
+  - part2: Links+Development
+  - part3: Quality Control+Task Tracking
+
+- Sprint4 Confluence Export
+  - part1: Requirements+Architecture
+  - part2: Links+Development
+  - part3: Quality Control+Task Tracking+Handover
+
 - Presentation slides
