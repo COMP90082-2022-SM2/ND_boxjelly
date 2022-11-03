@@ -21,15 +21,10 @@ The project team intended to provide feasible solutions to the described problem
 
 ## Github repo
 
-├── docs/                    # Documentation files (Includes requirements, confluence export etc)
+├── docs/                    # Documentation files (Includes requirements, confluence export, release notes)
 
 ├── src/                       # src code
 
 ├── tests/                    # User/system tests
 
-├── prototypes/low fidelity/     # low fidelity files (screens, mockups etc)
-
-├── prototypes/high fidelity/     # high fidelity files (screens, source files etc)
-
-
-├── data samples/      # Includes Positive Behaviour Support Plan (PBSP) samples
+├── data samples/      # Includes Positive Behaviour Support Plan (PBSP) Document samples
