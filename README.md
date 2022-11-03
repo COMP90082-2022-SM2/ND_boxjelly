@@ -9,7 +9,7 @@ This is another version of code to extract content from PDF which has not been d
 
 
 ## Install all the packages required to run this project use the code:
-pip install -r requirements.txt
+**pip install -r requirements.txt**
 
 # Run
 1.	open the XAMPP and start both Apache and MySQL.
