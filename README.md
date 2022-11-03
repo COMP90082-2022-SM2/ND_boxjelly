@@ -23,7 +23,7 @@ The project team intended to provide feasible solutions to the described problem
 
 ├── docs/                    # Documentation files (Includes requirements, confluence export, release notes, presentation slides)
 
-├── src/                       # src code
+├── src/                       # src code & data modelling diagram
 
 ├── tests/                    # User/system tests
 
